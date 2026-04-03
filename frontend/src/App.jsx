@@ -1,29 +1,40 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
+import MatchCard from './components/MatchCard'
+import Auth from './components/Auth'
 
 export default function App() {
   const [matches, setMatches] = useState([])
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
+    // Auth session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    // Fetch matches
     supabase.from("matches").select(`
       *,
       home_team:teams!fk_home_team(name),
       away_team:teams!fk_away_team(name)
     `)
-    .then(({ data, error }) => {
-      console.log("data:", data)
-      console.log("error:", error)
-      setMatches(data)
-    })
+    .then(({ data }) => setMatches(data))
+
+    return () => subscription.unsubscribe()
   }, [])
 
   return (
     <div>
       <h1>WC2026 Fantasy App</h1>
+      {!user && <Auth />}
+      {user && <p>Welcome, {user.email}</p>}
       {matches.map(match => (
-        <p key={match.id}>
-          {match.home_team?.name} vs {match.away_team?.name}
-        </p>
+        <MatchCard key={match.id} match={match} />
       ))}
     </div>
   )
