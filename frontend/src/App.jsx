@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import MatchCard from './components/MatchCard'
 import Auth from './components/Auth'
+import Leaderboard from './components/Leaderboard'
 
 export default function App() {
   const [matches, setMatches] = useState([])
@@ -40,6 +41,7 @@ export default function App() {
       <h1>WC2026 Fantasy App</h1>
       {!user && <Auth />}
       {user && <p>Welcome, {user.email}</p>}
+      <Leaderboard />
       {matches.map(match => (
         <MatchCard key={match.id} match={match} user={user}
         existingPick={picks.find(pick => pick.match_id === match.id)}

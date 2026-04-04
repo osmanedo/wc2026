@@ -225,3 +225,10 @@ SELECT p.*, m.home_score, m.away_score
 FROM picks p
 JOIN matches m ON m.id = p.match_id
 WHERE p.match_id = 537327;
+
+-- 19 Enable secure reads on Leaderboard table
+ALTER TABLE leaderboard ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public can read leaderboard"
+ON leaderboard FOR SELECT
+USING (true);
