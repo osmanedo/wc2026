@@ -6,13 +6,18 @@ import Auth from './components/Auth'
 export default function App() {
   const [matches, setMatches] = useState([])
   const [user, setUser] = useState(null)
+  const [picks, setPicks] = useState([])
+  const fetchPicks = () => {
+  console.log("fetchPicks called")
+  supabase.from("picks").select("*")
+    .then(({ data }) => setPicks(data))
+}
 
   useEffect(() => {
     // Auth session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
@@ -25,7 +30,9 @@ export default function App() {
     `)
     .then(({ data }) => setMatches(data))
 
-    return () => subscription.unsubscribe()
+    fetchPicks() 
+
+     return () => subscription.unsubscribe()
   }, [])
 
   return (
@@ -34,7 +41,10 @@ export default function App() {
       {!user && <Auth />}
       {user && <p>Welcome, {user.email}</p>}
       {matches.map(match => (
-        <MatchCard key={match.id} match={match} />
+        <MatchCard key={match.id} match={match} user={user}
+        existingPick={picks.find(pick => pick.match_id === match.id)}
+        onPickSubmitted={fetchPicks}
+        />
       ))}
     </div>
   )
