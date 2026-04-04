@@ -252,3 +252,54 @@ BEGIN
     correct_results = EXCLUDED.correct_results;
 END;
 $$ LANGUAGE plpgsql;
+
+-- 20 Build Groups Tables
+CREATE TABLE groups (
+id SERIAL PRIMARY KEY,
+name TEXT NOT NULL,
+code TEXT UNIQUE NOT NULL,
+created_by UUID,
+created_at TIMESTAMPTZ DEFAULT now(),
+CONSTRAINT fk_created_by
+FOREIGN KEY (created_by)
+REFERENCES profiles(id)
+);
+
+CREATE TABLE group_members (
+id SERIAL PRIMARY KEY,
+group_id INT NOT NULL,
+user_id UUID,
+joined_at TIMESTAMPTZ DEFAULT now(),
+CONSTRAINT fk_group_id
+FOREIGN KEY (group_id)
+REFERENCES groups(id),
+CONSTRAINT fk_profile_id
+FOREIGN KEY (user_id)
+REFERENCES profiles(id),
+CONSTRAINT unique_groups
+UNIQUE (group_id, user_id)
+)
+
+-- 21 Add RLS to Groups and Group Members
+ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE group_members ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can read groups (needed to validate join codes)
+CREATE POLICY "Public can read groups"
+ON groups FOR SELECT
+USING (true);
+
+-- Only authenticated users can create groups
+CREATE POLICY "Users can create groups"
+ON groups FOR INSERT
+WITH CHECK (auth.uid() = created_by);
+
+-- Users can read group members for groups they belong to
+CREATE POLICY "Users can read group members"
+ON group_members FOR SELECT
+USING (true);
+
+-- Users can join groups
+CREATE POLICY "Users can join groups"
+ON group_members FOR INSERT
+WITH CHECK (auth.uid() = user_id);
