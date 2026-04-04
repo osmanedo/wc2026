@@ -232,3 +232,23 @@ ALTER TABLE leaderboard ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public can read leaderboard"
 ON leaderboard FOR SELECT
 USING (true);
+
+-- 19 Build Leaderboard View
+CREATE OR REPLACE FUNCTION refresh_leaderboard()
+RETURNS VOID AS $$
+BEGIN
+  INSERT INTO leaderboard (user_id, total_points, exact_scores, correct_results)
+  SELECT 
+    user_id,
+    COALESCE(SUM(points_earned), 0) AS total_points,
+    COUNT(*) FILTER (WHERE points_earned = 5) AS exact_scores,
+    COUNT(*) FILTER (WHERE points_earned >= 2) AS correct_results
+  FROM picks
+  GROUP BY user_id
+  ON CONFLICT (user_id) 
+  DO UPDATE SET
+    total_points = EXCLUDED.total_points,
+    exact_scores = EXCLUDED.exact_scores,
+    correct_results = EXCLUDED.correct_results;
+END;
+$$ LANGUAGE plpgsql;
