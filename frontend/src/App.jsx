@@ -9,6 +9,8 @@ export default function App() {
   const [matches, setMatches] = useState([])
   const [user, setUser] = useState(null)
   const [picks, setPicks] = useState([])
+  const [selectedGroup, setSelectedGroup] = useState(null)
+  const [userGroups, setUserGroups] = useState([])
   const [showGroupPanel, setShowGroupPanel] = useState(false)
   const fetchPicks = () => {
   console.log("fetchPicks called")
@@ -17,7 +19,7 @@ export default function App() {
 }
 
   useEffect(() => {
-    // Auth session
+      // Auth session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
@@ -33,10 +35,21 @@ export default function App() {
     `)
     .then(({ data }) => setMatches(data))
 
-    fetchPicks() 
-
      return () => subscription.unsubscribe()
   }, [])
+
+  // Separate useEffect that runs whenever user changes
+useEffect(() => {
+  if (!user) return
+
+  supabase
+    .from("group_members")
+    .select(`*, group:groups(id, name, code)`)
+    .eq("user_id", user.id)
+    .then(({ data }) => setUserGroups(data?.map(m => m.group) || []))
+
+  fetchPicks()
+}, [user])
 
   return (
     <div>
@@ -44,6 +57,19 @@ export default function App() {
       {!user && <Auth />}
       {user && <p>Welcome, {user.email}</p>}
       <Leaderboard />
+      {user && userGroups.length > 0 && (
+        <div>
+          <button onClick={() => setSelectedGroup(null)}>All Players</button>
+          {userGroups.map(group => (
+            <button key={group.id} onClick={() => setSelectedGroup(group)}>
+              {group.name}
+            </button>
+          ))}
+        </div>
+    )}
+
+    <Leaderboard selectedGroup={selectedGroup} />
+    
       {user && (
         <button onClick={() => setShowGroupPanel(true)}>
           My Groups
