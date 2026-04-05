@@ -3,15 +3,17 @@ import { supabase } from './lib/supabase'
 import MatchCard from './components/MatchCard'
 import Auth from './components/Auth'
 import Leaderboard from './components/Leaderboard'
+import GroupPanel from './components/GroupPanel'
 
 export default function App() {
   const [matches, setMatches] = useState([])
   const [user, setUser] = useState(null)
   const [picks, setPicks] = useState([])
+  const [showGroupPanel, setShowGroupPanel] = useState(false)
   const fetchPicks = () => {
   console.log("fetchPicks called")
   supabase.from("picks").select("*")
-    .then(({ data }) => setPicks(data))
+    .then(({ data }) => setPicks(data))  
 }
 
   useEffect(() => {
@@ -42,12 +44,24 @@ export default function App() {
       {!user && <Auth />}
       {user && <p>Welcome, {user.email}</p>}
       <Leaderboard />
+      {user && (
+        <button onClick={() => setShowGroupPanel(true)}>
+          My Groups
+        </button>
+      )}
+
+      {showGroupPanel && (
+        <GroupPanel 
+          user={user} 
+          onClose={() => setShowGroupPanel(false)} 
+        />
+      )} 
       {matches.map(match => (
         <MatchCard key={match.id} match={match} user={user}
         existingPick={picks.find(pick => pick.match_id === match.id)}
         onPickSubmitted={fetchPicks}
         />
       ))}
+ 
     </div>
-  )
-}
+)}
