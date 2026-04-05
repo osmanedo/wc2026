@@ -49,6 +49,9 @@ useEffect(() => {
     .then(({ data }) => setUserGroups(data?.map(m => m.group) || []))
 
   fetchPicks()
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+  }
 }, [user])
 
   return (
@@ -72,8 +75,6 @@ useEffect(() => {
           ))}
         </div>
     )}
-
-    <Leaderboard selectedGroup={selectedGroup} />
 
       {user && (
         <button onClick={() => setShowGroupPanel(true)}>
