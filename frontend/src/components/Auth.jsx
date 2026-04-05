@@ -10,6 +10,10 @@ export default function Auth() {
     })
   }
 
+  const handleLogout = async () => {
+  await supabase.auth.signOut()
+  }
+
   return (
     <button onClick={handleLogin}>
       Sign in with Google

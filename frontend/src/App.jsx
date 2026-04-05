@@ -55,7 +55,12 @@ useEffect(() => {
     <div>
       <h1>WC2026 Fantasy App</h1>
       {!user && <Auth />}
-      {user && <p>Welcome, {user.email}</p>}
+      {user && (
+        <div>
+          <p>Welcome, {user.email}</p>
+          <button onClick={handleLogout}>Sign Out</button>
+        </div>
+      )}
       <Leaderboard />
       {user && userGroups.length > 0 && (
         <div>
@@ -69,7 +74,7 @@ useEffect(() => {
     )}
 
     <Leaderboard selectedGroup={selectedGroup} />
-    
+
       {user && (
         <button onClick={() => setShowGroupPanel(true)}>
           My Groups
