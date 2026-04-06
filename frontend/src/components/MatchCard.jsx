@@ -16,6 +16,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
   return (
     <div className="match-card" onClick={() => isTimed && user && setShowPicker(true)}>
       <div className="match-teams">
+        <img className="team-flag" src={match.home_team.flag_url} alt={`${match.home_team.name} flag`} />
         <span className="team-name">{match.home_team.name}</span>
         <div className="match-center">
           {isFinished ? (
@@ -23,14 +24,15 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
           ) : (
             <span className="kickoff-time">{kickoff}</span>
           )}
-          <span className={`status-badge ${match.status.toLowerCase()}`}>
-            {isFinished ? 'FT' : match.status === 'TIMED' ? 'vs' : match.status}
-          </span>          
             <span className="timezone-label">
               {Intl.DateTimeFormat().resolvedOptions().timeZone.replace('Australia/', '')}
-            </span>
+            </span>          
+          <span className={`status-badge ${match.status.toLowerCase()}`}>
+            {isFinished ? 'FT' : match.status === 'TIMED' ? 'vs' : match.status}
+          </span>        
         </div>
         <span className="team-name right">{match.away_team.name}</span>
+        <img className="team-flag" src={match.away_team.flag_url} alt={`${match.away_team.name} flag`} />
       </div>
 
       {existingPick ? (

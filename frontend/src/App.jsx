@@ -39,8 +39,8 @@ export default function App() {
     })
     supabase.from("matches").select(`
       *,
-      home_team:teams!fk_home_team(name),
-      away_team:teams!fk_away_team(name)
+      home_team:teams!fk_home_team(name, flag_url),
+      away_team:teams!fk_away_team(name, flag_url)
     `).then(({ data }) => setMatches(data))
 
     return () => subscription.unsubscribe()
