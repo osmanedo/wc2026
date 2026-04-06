@@ -23,12 +23,12 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
           ) : (
             <span className="kickoff-time">{kickoff}</span>
           )}
+          <span className={`status-badge ${match.status.toLowerCase()}`}>
+            {isFinished ? 'FT' : match.status === 'TIMED' ? 'vs' : match.status}
+          </span>          
             <span className="timezone-label">
               {Intl.DateTimeFormat().resolvedOptions().timeZone.replace('Australia/', '')}
             </span>
-          <span className={`status-badge ${match.status.toLowerCase()}`}>
-            {isFinished ? 'FT' : 'vs'}
-          </span>
         </div>
         <span className="team-name right">{match.away_team.name}</span>
       </div>
