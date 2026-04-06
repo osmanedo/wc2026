@@ -11,7 +11,7 @@ export default function Auth() {
   }
 
   return (
-    <button onClick={handleLogin}>
+    <button className="signin-btn" onClick={handleLogin}>
       Sign in with Google
     </button>
   )

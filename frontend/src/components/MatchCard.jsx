@@ -1,37 +1,60 @@
 import { useState } from 'react'
 import ScorePicker from './ScorePicker'
+import './MatchCard.css'
 
 export default function MatchCard({ match, user, existingPick, onPickSubmitted }) {
   const [showPicker, setShowPicker] = useState(false)
 
+  const kickoff = new Date(match.kickoff_utc).toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+
+  const isFinished = match.status === 'FINISHED'
+  const isTimed = match.status === 'TIMED'
+
   return (
-    <div onClick={() => setShowPicker(true)}>
-      <p>{match.home_team.name} vs {match.away_team.name}</p>
-      <p>{new Date(match.kickoff_utc).toLocaleString(undefined, {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      })}</p>
-      <p>{match.status}</p>
-      <p style={{ fontSize: '11px', color: 'gray' }}>
-        {Intl.DateTimeFormat().resolvedOptions().timeZone}
-      </p>  
+    <div className="match-card" onClick={() => isTimed && user && setShowPicker(true)}>
+      <div className="match-teams">
+        <span className="team-name">{match.home_team.name}</span>
+        <div className="match-center">
+          {isFinished ? (
+            <span className="score">{match.home_score} - {match.away_score}</span>
+          ) : (
+            <span className="kickoff-time">{kickoff}</span>
+          )}
+            <span className="timezone-label">
+              {Intl.DateTimeFormat().resolvedOptions().timeZone.replace('Australia/', '')}
+            </span>
+          <span className={`status-badge ${match.status.toLowerCase()}`}>
+            {isFinished ? 'FT' : 'vs'}
+          </span>
+        </div>
+        <span className="team-name right">{match.away_team.name}</span>
+      </div>
+
       {existingPick ? (
-        <p>Your pick: {existingPick.pick_home} - {existingPick.pick_away}</p>
-      ):  (
-        <p>No pick submitted yet</p>
+        <div className="pick-display">
+          ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+          {existingPick.points_earned != null && (
+            <span className="points-badge">{existingPick.points_earned} pts</span>
+          )}
+        </div>
+      ) : (
+        isTimed && user && <div className="pick-prompt">Tap to tip</div>
       )}
-      
-      {showPicker && user && (
+
+      {showPicker && (
         <div onClick={(e) => e.stopPropagation()}>
           <ScorePicker
             match={match}
             user={user}
             onPickSubmitted={() => {
-             setShowPicker(false)
-             onPickSubmitted()
+              setShowPicker(false)
+              onPickSubmitted()
             }}
           />
-          <button onClick={(e) => {
+          <button className="cancel-btn" onClick={(e) => {
             e.stopPropagation()
             setShowPicker(false)
           }}>Cancel</button>

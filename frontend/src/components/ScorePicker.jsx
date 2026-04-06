@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import './ScorePicker.css'
 
 export default function ScorePicker({ match, user, onPickSubmitted }) {
   const [homeScore, setHomeScore] = useState(0)
@@ -21,21 +22,29 @@ export default function ScorePicker({ match, user, onPickSubmitted }) {
   }
 
   return (
-    <div>
-      <input
-        type="number"
-        min="0"
-        value={homeScore}
-        onChange={(e) => setHomeScore(Number(e.target.value))}
-      />
-      <input
-        type="number"
-        min="0"
-        value={awayScore}
-        onChange={(e) => setAwayScore(Number(e.target.value))}
-      />
-      <button onClick={handleSubmit}>
-        Submit Score
+    <div className="score-picker">
+      <p className="picker-label">Enter your prediction</p>
+      <div className="picker-row">
+        <div className="picker-team">
+          <span className="picker-team-name">{match.home_team.name}</span>
+          <div className="score-controls">
+            <button onClick={() => setHomeScore(Math.max(0, homeScore - 1))}>−</button>
+            <span className="score-value">{homeScore}</span>
+            <button onClick={() => setHomeScore(homeScore + 1)}>+</button>
+          </div>
+        </div>
+        <span className="picker-vs">—</span>
+        <div className="picker-team">
+          <span className="picker-team-name">{match.away_team.name}</span>
+          <div className="score-controls">
+            <button onClick={() => setAwayScore(Math.max(0, awayScore - 1))}>−</button>
+            <span className="score-value">{awayScore}</span>
+            <button onClick={() => setAwayScore(awayScore + 1)}>+</button>
+          </div>
+        </div>
+      </div>
+      <button className="submit-btn" onClick={handleSubmit}>
+        Submit Tip
       </button>
     </div>
   )
