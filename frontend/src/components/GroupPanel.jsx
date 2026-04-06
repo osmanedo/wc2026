@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import './GroupPanel.css'
 
 export default function GroupPanel({ user, onClose }) {
   const [mode, setMode] = useState('join')
@@ -8,99 +9,86 @@ export default function GroupPanel({ user, onClose }) {
   const [message, setMessage] = useState('')
 
   const handleCreate = async () => {
-    // Generate random 6-character code
     const code = Math.random().toString(36).substring(2, 8).toUpperCase()
-
-    // Insert the group
     const { data: group, error: groupError } = await supabase
       .from("groups")
       .insert({ name: groupName, code: code, created_by: user.id })
       .select()
       .single()
 
-    if (groupError) {
-      setMessage("Error creating group: " + groupError.message)
-      return
-    }
+    if (groupError) { setMessage("Error creating group"); return }
 
-    // Auto-join creator to the group
-    const { error: memberError } = await supabase
-      .from("group_members")
-      .insert({ group_id: group.id, user_id: user.id })
-
-    if (memberError) {
-      setMessage("Error joining group: " + memberError.message)
-      return
-    }
-
-    setMessage(`Group created! Share this code with friends: ${code}`)
+    await supabase.from("group_members").insert({ group_id: group.id, user_id: user.id })
+    setMessage(`Group created! Share this code: ${code}`)
   }
 
   const handleJoin = async () => {
-    // Find group by code
-    const { data: group, error: findError } = await supabase
-      .from("groups")
-      .select("*")
+    const { data: group, error } = await supabase
+      .from("groups").select("*")
       .eq("code", joinCode.toUpperCase())
       .single()
 
-    if (findError || !group) {
-      setMessage("Group not found — check the code and try again")
-      return
-    }
+    if (error || !group) { setMessage("Group not found — check the code"); return }
 
-    // Join the group
     const { error: joinError } = await supabase
       .from("group_members")
       .insert({ group_id: group.id, user_id: user.id })
 
-    if (joinError) {
-      setMessage("Error joining — you may already be in this group")
-      return
-    }
-
+    if (joinError) { setMessage("You may already be in this group"); return }
     setMessage(`Joined "${group.name}" successfully!`)
   }
 
   return (
-    <div>
-      {/* Toggle */}
-      <div>
-        <button onClick={() => setMode('join')}>Join a Group</button>
-        <button onClick={() => setMode('create')}>Create a Group</button>
+    <div className="group-panel">
+      <h3 className="panel-title">
+        {mode === 'create' ? 'Create a Group' : 'Join a Group'}
+      </h3>
+
+      <div className="mode-toggle">
+        <button
+          className={`mode-btn ${mode === 'join' ? 'active' : ''}`}
+          onClick={() => setMode('join')}>
+          Join
+        </button>
+        <button
+          className={`mode-btn ${mode === 'create' ? 'active' : ''}`}
+          onClick={() => setMode('create')}>
+          Create
+        </button>
       </div>
 
-      {/* Create mode */}
       {mode === 'create' && (
-        <div>
+        <>
           <input
+            className="panel-input"
             type="text"
-            placeholder="Group name (e.g. Dad's Work Crew)"
+            placeholder="Group name (e.g. Dad's Crew)"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
           />
-          <button onClick={handleCreate}>Create Group</button>
-        </div>
+          <button className="panel-submit-btn" onClick={handleCreate}>
+            Create Group
+          </button>
+        </>
       )}
 
-      {/* Join mode */}
       {mode === 'join' && (
-        <div>
+        <>
           <input
+            className="panel-input"
             type="text"
-            placeholder="Enter join code (e.g. DAD2026)"
+            placeholder="Enter join code (e.g. ABC123)"
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value)}
           />
-          <button onClick={handleJoin}>Join Group</button>
-        </div>
+          <button className="panel-submit-btn" onClick={handleJoin}>
+            Join Group
+          </button>
+        </>
       )}
 
-      {/* Message */}
-      {message && <p>{message}</p>}
-
-      {/* Close */}
-      <button onClick={onClose}>Close</button>
+      {message && <p className="panel-message">{message}</p>}
+      <button className="panel-close-btn" onClick={onClose}>Cancel</button>
     </div>
   )
 }

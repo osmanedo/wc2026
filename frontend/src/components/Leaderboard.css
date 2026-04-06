@@ -1,0 +1,99 @@
+.leaderboard {
+  padding: 4px 0;
+}
+
+.leaderboard-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 4px;
+}
+
+.leaderboard-subtitle {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-bottom: 16px;
+}
+
+.leaderboard-entry {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.leaderboard-entry.top {
+  border-left: 3px solid var(--green);
+}
+
+.rank {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--gray-200);
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.rank.gold { color: #f59e0b; }
+.rank.silver { color: #94a3b8; }
+.rank.bronze { color: #b45309; }
+
+.entry-info {
+  flex: 1;
+}
+
+.entry-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-900);
+}
+
+.entry-stats {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+.entry-points {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--green);
+}
+
+.entry-points-label {
+  font-size: 10px;
+  color: var(--gray-400);
+  text-align: right;
+}
+
+.group-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.group-tab {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-600);
+  white-space: nowrap;
+}
+
+.group-tab.active {
+  background: var(--green);
+  color: var(--white);
+  border-color: var(--green);
+}

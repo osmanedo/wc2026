@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import './Leaderboard.css'
 
 export default function Leaderboard({ selectedGroup }) {
   const [entries, setEntries] = useState([])
@@ -32,27 +33,29 @@ useEffect(() => {
 }, [selectedGroup])
 
   return (
-  <div>
-    <h2>Leaderboard {selectedGroup ? `— ${selectedGroup.name}` : '— All Players'}</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Player</th>
-          <th>Points</th>
-          <th>Exact Scores</th>
-        </tr>
-      </thead>
-      <tbody>
-        {entries.map((entry, index) => (
-          <tr key={entry.user_id}>
-            <td>{index + 1}</td>
-            <td>{entry.profile?.display_name ?? 'Unknown'}</td>
-            <td>{entry.total_points}</td>
-            <td>{entry.exact_scores}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+  <div className="leaderboard">
+    <h2 className="leaderboard-title">Leaderboard</h2>
+    <p className="leaderboard-subtitle">
+      {selectedGroup ? selectedGroup.name : 'All Players'}
+    </p>
+    {entries.map((entry, index) => (
+      <div key={entry.user_id} className={`leaderboard-entry ${index < 3 ? 'top' : ''}`}>
+        <div className={`rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}`}>
+          {index + 1}
+        </div>
+        <div className="entry-info">
+          <div className="entry-name">
+            {entry.profile?.display_name ?? entry.profile?.email ?? 'Player'}
+          </div>
+          <div className="entry-stats">
+            {entry.exact_scores} exact · {entry.correct_results} correct
+          </div>
+        </div>
+        <div>
+          <div className="entry-points">{entry.total_points}</div>
+          <div className="entry-points-label">pts</div>
+        </div>
+      </div>
+    ))}
   </div>
 )}

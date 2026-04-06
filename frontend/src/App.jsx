@@ -95,13 +95,20 @@ export default function App() {
         {view === 'leaderboard' && (
           <div>
             {user && userGroups.length > 0 && (
-              <div className="group-selector">
-                <button onClick={() => setSelectedGroup(null)}>All Players</button>
+              <div className="group-tabs">
+                <button 
+                className={`group-tab ${!selectedGroup ? 'active' : ''}`}
+                  onClick={() => setSelectedGroup(null)}>
+                  All Players
+                </button>
                 {userGroups.map(group => (
-                  <button key={group.id} onClick={() => setSelectedGroup(group)}>
-                    {group.name}
-                  </button>
-                ))}
+                  <button 
+                  key={group.id}
+                  className={`group-tab ${selectedGroup?.id === group.id ? 'active' : ''}`}
+                  onClick={() => setSelectedGroup(group)}>
+                  {group.name}
+                </button>
+              ))}
               </div>
             )}
             <Leaderboard selectedGroup={selectedGroup} />
@@ -109,24 +116,31 @@ export default function App() {
         )}
 
         {view === 'groups' && (
-          <div>
-            <button onClick={() => setShowGroupPanel(true)}>
+          <div className="groups-view">
+            <h2 className="groups-title">My Groups</h2>
+            <p className="groups-subtitle">Create or join a group to compete with friends</p>
+            <button className="create-join-btn" onClick={() => setShowGroupPanel(true)}>
               + Create or Join a Group
             </button>
             {showGroupPanel && (
-              <GroupPanel
-                user={user}
-                onClose={() => setShowGroupPanel(false)}
-              />
+              <GroupPanel user={user} onClose={() => setShowGroupPanel(false)} />
             )}
-            <div>
-              <h2>My Groups</h2>
-              {userGroups.map(group => (
-                <div key={group.id}>
-                  <p>{group.name}</p>
-                  <p>Code: {group.code}</p>
+            <div className="my-groups-list">
+              {userGroups.length === 0 ? (
+                <div className="no-groups">
+                  You haven't joined any groups yet
                 </div>
-              ))}
+              ) : (
+                userGroups.map(group => (
+                  <div key={group.id} className="group-card">
+                    <div>
+                      <div className="group-card-name">{group.name}</div>
+                      <div className="group-card-code">Share code with friends</div>
+                    </div>
+                    <div className="code-badge">{group.code}</div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
