@@ -64,8 +64,10 @@ export default function App() {
     <div className="app">
       {/* Header */}
       <header className="header">
-        <img src="/fifa-world-cup-2026-logo.png" alt="WC2026 Logo" className="logo" />
-        <h1>World Cup 2026 Fantasy</h1>
+        <div className="brand">
+          <img src="/fifa-world-cup-2026-logo.png" alt="WC2026 Logo" className="logo" />
+          <h1>World Cup 2026 Fantasy</h1>
+        </div>
         {!user && <Auth className="signin-btn"/>}
         {user && (
           <div className="user-bar">
