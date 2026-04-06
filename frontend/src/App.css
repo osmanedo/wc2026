@@ -25,20 +25,20 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .header h1 {
   margin: 0;
   font-family: 'Syne', sans-serif;
   font-weight: 800;
-  font-size: 22px;
+  font-size: 24px;
   color: var(--white);
   letter-spacing: -0.5px;
 }
 
 .header .logo {
-  width: 40px;
+  width: 44px;
   height: auto;
 }
 
@@ -49,17 +49,19 @@
 }
 
 .user-bar {
+  position: absolute;
+  right: 10px;
+  top: 80%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-left: auto;
-  margin-top: 0px;
+  gap: 10px;
+  opacity: 0.72;
 }
 
 .user-bar span {
   font-size: 12px;
-  color: var(--green-accent);
+  color: var(--white);
 }
 
 .user-bar button {
@@ -67,10 +69,10 @@
   color: var(--green-accent);
   background: none;
   border: 1px solid var(--green-accent);
-  border-radius: 20px;
+  border-radius: 18px;
   padding: 3px 10px;
   display: flex;
-  align-items: center;
+  align-items: bottom;
   gap: 4px;
 }
 
