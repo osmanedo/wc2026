@@ -41,7 +41,7 @@ export default function App() {
       *,
       home_team:teams!fk_home_team(name, flag_url),
       away_team:teams!fk_away_team(name, flag_url)
-    `).then(({ data }) => setMatches(data))
+    `).order('kickoff_utc', { ascending: true }).then(({ data }) => setMatches(data))
 
     return () => subscription.unsubscribe()
   }, [])

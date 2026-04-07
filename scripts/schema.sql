@@ -303,3 +303,19 @@ USING (true);
 CREATE POLICY "Users can join groups"
 ON group_members FOR INSERT
 WITH CHECK (auth.uid() = user_id);
+
+-- 22 Enforce kickoff time insert rule
+CREATE POLICY "Picks kickoff lockdown"
+ON picks
+FOR INSERT
+WITH CHECK (
+  (SELECT kickoff_utc FROM matches WHERE matches.id = match_id) > now()
+);
+
+-- 23 Enforce restrict picks until match kickoff
+CREATE POLICY "Picks kickoff restrict"
+ON picks
+FOR UPDATE
+WITH CHECK (
+  (SELECT kickoff_utc FROM matches WHERE matches.id = match_id) > now()
+);
