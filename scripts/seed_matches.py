@@ -41,7 +41,7 @@ for match in match_data["matches"]:
         print(f"Skipping missing team match: {match['homeTeam']['name']} vs {match['awayTeam']['name']}")
         continue
 
-    supabase.table("matches").insert({
+    supabase.table("matches").upsert({
         "id": match["id"],
         "home_team_id": match["homeTeam"]["id"],
         "away_team_id": match["awayTeam"]["id"],
@@ -51,4 +51,4 @@ for match in match_data["matches"]:
         "away_score": match["score"]["fullTime"]["away"],
         "status": match["status"],
         "group_name": match["group"],
-    }).execute()
+    }, on_conflict="id").execute()

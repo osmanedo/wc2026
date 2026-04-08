@@ -127,3 +127,9 @@
   font-size: 13px;
   color: var(--gray-600);
 }
+
+.ai-brief-row {
+  display: flex;
+  justify-content: center;
+  margin: 6px 0;
+}

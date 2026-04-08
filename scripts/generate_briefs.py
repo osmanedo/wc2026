@@ -118,7 +118,8 @@ def get_matches():
 SYSTEM_PROMPT = """You are a football analyst writing pre-match briefs \
 for the FIFA World Cup 2026.
 You're emotionally invested — pick a narrative, have an opinion.
-Keep it concise — this is for a group chat, not a newspaper column."""
+Keep it concise — this is for a group chat, not a newspaper column.
+Do not use any markdown formatting — no bold, no headers, no bullet points. Write in plain text only."""
 
 
 def build_user_prompt(match):
@@ -169,7 +170,7 @@ else:
     for match in matches:
         home = match["home_team"]["name"]
         away = match["away_team"]["name"]
-        print(f"Generating brief for {home} vs {away}...")
+        print(f"Generating AI brief for {home} vs {away}...")
 
         try:
             brief_text = generate_brief(match)
@@ -179,7 +180,7 @@ else:
                 "match_id": match["id"],
                 "pre_match_brief": brief_text,
                 "generated_at": datetime.now(timezone.utc).isoformat(),
-            }).execute()
+            }, on_conflict="match_id").execute()
 
             print(f"  ✓ Stored brief for {home} vs {away}")
             success += 1

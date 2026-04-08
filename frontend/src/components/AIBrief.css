@@ -1,0 +1,115 @@
+/* ── Overlay ─────────────────────────────────────────── */
+.ai-brief-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+/* ── Modal ────────────────────────────────────────────── */
+.ai-brief-modal {
+  background: #f5f5f0;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.ai-brief-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  background: #f5f5f0;
+  border-radius: 16px 16px 0 0;
+}
+
+.ai-brief-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #1a472a;
+}
+
+.ai-brief-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #888;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.ai-brief-close:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+/* ── Body ────────────────────────────────────────────── */
+.ai-brief-body {
+  padding: 20px;
+}
+
+.ai-brief-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #2a2a2a;
+  white-space: pre-wrap;
+}
+
+.ai-brief-loading,
+.ai-brief-error {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+  padding: 24px 0;
+}
+
+.ai-brief-error {
+  color: #c0392b;
+}
+
+.ai-brief-timestamp {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 16px;
+  text-align: right;
+}
+
+/* ── Trigger button (used in MatchCard) ──────────────── */
+.ai-brief-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(26, 71, 42, 0.08);
+  border: 1px solid rgba(26, 71, 42, 0.2);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1a472a;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ai-brief-btn:hover {
+  background: rgba(26, 71, 42, 0.15);
+}
