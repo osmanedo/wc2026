@@ -135,7 +135,7 @@ export default function Leaderboard({ selectedGroup }) {
             )}
             <div className="power-badges">
               {entry.current_streak > 1 && (
-                <span className="badge streak">🔥 {entry.current_streak}</span>
+                <span className="badge streak"> {entry.current_streak}</span>
               )}
               {entry.accuracy_pct > 0 && (
                 <span className="badge accuracy">{entry.accuracy_pct}%</span>
