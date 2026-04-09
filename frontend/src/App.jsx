@@ -254,6 +254,10 @@ export default function App() {
         }} />
       )}
 
+      <footer className="app-footer">
+        <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+      </footer>
+
       {/* Bottom Nav */}
       <nav className="bottom-nav">
         <button onClick={() => setView('fixtures')} className={view === 'fixtures' ? 'active' : ''}>
