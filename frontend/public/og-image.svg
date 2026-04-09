@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="#2d6a4f"/>
+      <stop offset="100%" stop-color="#1a472a"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <rect width="1200" height="630" fill="none" stroke="#52b788" stroke-width="0.5" opacity="0.08"
+    style="background-image: repeating-linear-gradient(0deg,transparent,transparent 59px,#52b788 60px)"/>
+
+  <!-- Trophy emoji large -->
+  <text x="600" y="270" font-size="160" text-anchor="middle" font-family="Segoe UI Emoji,Apple Color Emoji,Noto Color Emoji,sans-serif">🏆</text>
+
+  <!-- Title -->
+  <text x="600" y="370" font-size="72" font-weight="800" text-anchor="middle"
+    font-family="Arial Black,Arial,sans-serif" fill="#ffffff" letter-spacing="-1">
+    WC2026 Fantasy
+  </text>
+
+  <!-- Description -->
+  <text x="600" y="430" font-size="30" text-anchor="middle"
+    font-family="Arial,sans-serif" fill="#52b788" letter-spacing="0.3">
+    Pick scores · Compete with friends · AI match briefs
+  </text>
+
+  <!-- URL pill -->
+  <rect x="450" y="480" width="300" height="44" rx="22" fill="#52b788" opacity="0.2"/>
+  <text x="600" y="509" font-size="22" text-anchor="middle"
+    font-family="Arial,sans-serif" fill="#52b788">
+    wc2026fantasy.app
+  </text>
+</svg>
