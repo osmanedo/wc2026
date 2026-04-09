@@ -15,7 +15,10 @@ export default function Leaderboard({ selectedGroup }) {
       let query = supabase
         .from("leaderboard")
         .select(`*, profile:profiles(display_name)`)
-        .order("total_points", { ascending: false })
+        .order("total_points",    { ascending: false })
+        .order("exact_scores",    { ascending: false })
+        .order("correct_results", { ascending: false })
+        .order("accuracy_pct",    { ascending: false })
 
       if (selectedGroup) {
         const { data: members, error: membersError } = await supabase
@@ -91,7 +94,21 @@ export default function Leaderboard({ selectedGroup }) {
     <p className="leaderboard-subtitle">
       {selectedGroup ? selectedGroup.name : 'All Players'}
     </p>
-    {entries.map((entry, index) => (
+    {entries.map((entry, index) => {
+      const prev = entries[index - 1]
+      const tied = prev && prev.total_points === entry.total_points
+      let tiebreakerLabel = null
+      if (tied) {
+        if (prev.exact_scores !== entry.exact_scores) {
+          tiebreakerLabel = `${entry.exact_scores} exact`
+        } else if (prev.correct_results !== entry.correct_results) {
+          tiebreakerLabel = `${entry.correct_results} correct`
+        } else if (prev.accuracy_pct !== entry.accuracy_pct) {
+          tiebreakerLabel = `${entry.accuracy_pct}% acc`
+        }
+      }
+
+      return (
       <div key={entry.user_id} className={`leaderboard-entry ${index < 3 ? 'top' : ''}`}>
         <div className={`rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}`}>
           {index + 1}
@@ -102,6 +119,9 @@ export default function Leaderboard({ selectedGroup }) {
           </div>
           <div className="entry-stats">
             {entry.exact_scores} exact · {entry.correct_results} correct
+            {tiebreakerLabel && (
+              <span className="tiebreaker-hint"> · {tiebreakerLabel}</span>
+            )}
           </div>
           <div className="power-stats">
             {entry.last_5_form && (
@@ -131,6 +151,7 @@ export default function Leaderboard({ selectedGroup }) {
           <div className="entry-points-label">pts</div>
         </div>
       </div>
-    ))}
+      )
+    })}
   </div>
 )}

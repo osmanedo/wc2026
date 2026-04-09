@@ -17,6 +17,15 @@ export default function App() {
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [userGroups, setUserGroups] = useState([])
   const [groupsError, setGroupsError] = useState(null)
+  const [displayName, setDisplayName] = useState(null)
+  const [copiedCode, setCopiedCode] = useState(null)
+
+  const copyCode = (code) => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedCode(code)
+      setTimeout(() => setCopiedCode(null), 2000)
+    })
+  }
   const [showGroupPanel, setShowGroupPanel] = useState(false)
   const [showGroupSignIn, setShowGroupSignIn] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(
@@ -100,6 +109,12 @@ export default function App() {
         if (error) setGroupsError('Could not load your groups.')
         else setUserGroups(data?.map(m => m.group) || [])
       })
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => setDisplayName(data?.display_name ?? null))
     fetchPicks()
   }, [user])
 
@@ -128,7 +143,7 @@ export default function App() {
         {!user && <Auth className="signin-btn"/>}
         {user && (
           <div className="user-bar">
-            <span>{user.email}</span>
+            <span>{displayName ?? user.email}</span>
             <button onClick={handleLogout}>Sign Out</button>
           </div>
         )}
@@ -233,9 +248,11 @@ export default function App() {
                   <div key={group.id} className="group-card">
                     <div>
                       <div className="group-card-name">{group.name}</div>
-                      <div className="group-card-code">Share code with friends</div>
+                      <div className="group-card-code">Tap code to copy</div>
                     </div>
-                    <div className="code-badge">{group.code}</div>
+                    <button className={`code-badge${copiedCode === group.code ? ' copied' : ''}`} onClick={() => copyCode(group.code)}>
+                      {copiedCode === group.code ? 'Copied!' : group.code}
+                    </button>
                   </div>
                 ))
               )}

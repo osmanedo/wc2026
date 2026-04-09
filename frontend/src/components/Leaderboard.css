@@ -84,6 +84,11 @@
   margin-top: 2px;
 }
 
+.tiebreaker-hint {
+  color: #d97706;
+  font-weight: 500;
+}
+
 .entry-points {
   font-family: 'Syne', sans-serif;
   font-size: 22px;

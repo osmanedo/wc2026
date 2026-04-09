@@ -66,6 +66,15 @@
   font-weight: 700;
   color: var(--green);
   letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.code-badge.copied {
+  background: var(--green);
+  color: var(--white);
+  letter-spacing: normal;
 }
 
 .no-groups {
