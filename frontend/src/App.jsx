@@ -199,7 +199,7 @@ export default function App() {
             )}
             <Leaderboard selectedGroup={selectedGroup} />
             <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
-              How it worksss
+              How it works
             </button>
           </div>
         )}
