@@ -93,6 +93,27 @@
   text-align: right;
 }
 
+/* ── Divider between post-match and pre-match ────────── */
+.ai-brief-divider {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+}
+
+.ai-brief-sublabel {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: #1a472a;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.ai-brief-secondary {
+  color: #666;
+  font-size: 13px;
+}
+
 /* ── Trigger button (used in MatchCard) ──────────────── */
 .ai-brief-btn {
   display: inline-flex;

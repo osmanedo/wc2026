@@ -82,6 +82,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
       {showBrief && (
         <AIBrief
           matchId={match.id}
+          isFinished={isFinished}
           onClose={() => setShowBrief(false)}
         />
       )}
