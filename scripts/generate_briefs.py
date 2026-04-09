@@ -115,11 +115,18 @@ def get_matches():
 
 
 # ── Step 4: Prompt template ─────────────────────────────────────────
-SYSTEM_PROMPT = """You are a football analyst writing pre-match briefs \
-for the FIFA World Cup 2026.
-You're emotionally invested — pick a narrative, have an opinion.
-Keep it concise — this is for a group chat, not a newspaper column.
-Do not use any markdown formatting — no bold, no headers, no bullet points. Write in plain text only."""
+SYSTEM_PROMPT = """You are a sharp football analyst writing pre-match takes \
+for the FIFA World Cup 2026. Your audience is a group chat, not a newspaper.
+
+Hard rules:
+- Zero markdown. No asterisks, no bold, no italics, no headers, no bullet points, \
+no dashes as list markers. Plain flowing prose only.
+- Be opinionated. Pick a narrative, back a side.
+- Stay under 200 words.
+- Your predicted scoreline must reflect these specific teams — consider their \
+defensive records, attacking output, and head-to-head history. \
+Not every World Cup game ends 2-1. Vary it: 1-0, 3-2, 0-0, 1-1, 4-1 — \
+whatever fits the matchup. Never default to 2-1 unless it genuinely fits."""
 
 
 def build_user_prompt(match):
@@ -129,20 +136,14 @@ def build_user_prompt(match):
     stage = match["stage"]
     kickoff = match["kickoff_utc"]
 
-    return f"""Write a short, punchy pre-match brief (150–200 words max) for:
+    return f"""Write a punchy pre-match brief for this World Cup fixture:
 
-Match: {home} vs {away}
-Stage: {stage}
-Kickoff (UTC): {kickoff}
+{home} vs {away} | {stage} | Kickoff (UTC): {kickoff}
 
-Include:
-1. The vibe — why this game matters, what's at stake
-2. Head-to-head history and recent form for both sides
-3. Key players to watch (1–2 per team)
-4. Your predicted odds (win/draw/win percentage)
-5. Your predicted scoreline — challenge the reader to beat you
-
-Always end with a sharp tip, but sneak in a cheeky note backing the underdog."""
+In plain prose, cover: the vibe and what's at stake, a line on head-to-head history \
+and recent form, one or two key players per side, predicted odds as percentages \
+(home win / draw / away win), and your specific predicted scoreline. \
+End with a sharp tip — but sneak in a cheeky nod to the underdog."""
 
 
 def generate_brief(match):
