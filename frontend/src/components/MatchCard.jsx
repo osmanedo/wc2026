@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ScorePicker from './ScorePicker'
 import AIBrief from './AIBrief'
 import './MatchCard.css'
@@ -6,6 +6,13 @@ import './MatchCard.css'
 export default function MatchCard({ match, user, existingPick, onPickSubmitted }) {
   const [showPicker, setShowPicker] = useState(false)
   const [showBrief, setShowBrief] = useState(false)
+  const [now, setNow] = useState(Date.now())
+
+  // Tick every 30s so the countdown stays fresh
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 30_000)
+    return () => clearInterval(interval)
+  }, [])
 
   const kickoff = new Date(match.kickoff_utc).toLocaleTimeString(undefined, {
     hour: '2-digit',
@@ -13,7 +20,22 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
   })
 
   const isFinished = match.status === 'FINISHED'
-  const isTimed = match.status === 'TIMED'
+  const isTimed   = match.status === 'TIMED'
+  const isLocked  = !isTimed && !isFinished
+
+  const kickoffMs = new Date(match.kickoff_utc).getTime()
+  const msLeft    = kickoffMs - now
+  const isUnder24h = msLeft > 0 && msLeft < 24 * 60 * 60 * 1000
+  const isUrgent   = msLeft > 0 && msLeft < 60 * 60 * 1000  // under 1h
+
+  const getCountdown = () => {
+    const totalMins = Math.floor(msLeft / 60_000)
+    const hours = Math.floor(totalMins / 60)
+    const mins  = totalMins % 60
+    if (hours > 0) return `Kicks off in ${hours}h ${mins}m - Tip Soon!`
+    if (totalMins > 0) return `Kicks off in ${totalMins}m - Tip Now!`
+    return 'Kicking off soon - Finalise your tip!'
+  }
 
   return (
     <div className="match-card" onClick={() => isTimed && user && setShowPicker(true)}>
@@ -28,10 +50,10 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
           )}
             <span className="timezone-label">
               {Intl.DateTimeFormat().resolvedOptions().timeZone.replace('Australia/', '')}
-            </span>          
+            </span>
           <span className={`status-badge ${match.status.toLowerCase()}`}>
             {isFinished ? 'FT' : match.status === 'TIMED' ? 'vs' : match.status}
-          </span>        
+          </span>
         </div>
         <span className="team-name right">{match.away_team.name}</span>
         <img className="team-flag" src={match.away_team.flag_url} alt={`${match.away_team.name} flag`} />
@@ -56,6 +78,12 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
           {existingPick.points_earned != null && (
             <span className="points-badge">{existingPick.points_earned} pts</span>
           )}
+        </div>
+      ) : isLocked ? (
+        <div className="locked-badge">🔒 Locked</div>
+      ) : isTimed && user && isUnder24h ? (
+        <div className={`pick-prompt countdown${isUrgent ? ' urgent' : ''}`}>
+          ⏱ {getCountdown()}
         </div>
       ) : (
         isTimed && user && <div className="pick-prompt">Tap to tip</div>
