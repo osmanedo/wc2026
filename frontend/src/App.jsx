@@ -22,6 +22,36 @@ export default function App() {
   const [showHowItWorks, setShowHowItWorks] = useState(
     () => !localStorage.getItem('wc2026_welcomed')
   )
+  const [installPrompt, setInstallPrompt] = useState(null)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
+
+  useEffect(() => {
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+    if (!isMobile || localStorage.getItem('wc2026_install_dismissed')) return
+
+    const handler = (e) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+      setShowInstallBanner(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const handleInstall = async () => {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const { outcome } = await installPrompt.userChoice
+    if (outcome === 'accepted') {
+      setShowInstallBanner(false)
+      setInstallPrompt(null)
+    }
+  }
+
+  const dismissInstallBanner = () => {
+    localStorage.setItem('wc2026_install_dismissed', '1')
+    setShowInstallBanner(false)
+  }
 
   const matchesByDate = matches.reduce((groups, match) => {
     const date = new Date(match.kickoff_utc).toLocaleDateString('en-AU', {
@@ -79,6 +109,16 @@ export default function App() {
 
   return (
     <div className="app">
+      {showInstallBanner && (
+        <div className="install-banner">
+          <span className="install-banner-text">
+            📲 Add WC2026 Fantasy to your homescreen for the best experience
+          </span>
+          <button className="install-banner-btn" onClick={handleInstall}>Install</button>
+          <button className="install-banner-dismiss" onClick={dismissInstallBanner}>✕</button>
+        </div>
+      )}
+
       {/* Header */}
       <header className="header">
         <div className="brand">

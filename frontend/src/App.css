@@ -129,6 +129,44 @@
   font-weight: 500;
 }
 
+/* Install banner */
+.install-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a472a;
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.install-banner-text {
+  flex: 1;
+}
+
+.install-banner-btn {
+  background: #52b788;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.install-banner-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
 /* Empty states */
 .empty-state {
   text-align: center;
