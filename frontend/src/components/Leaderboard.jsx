@@ -50,6 +50,28 @@ useEffect(() => {
           <div className="entry-stats">
             {entry.exact_scores} exact · {entry.correct_results} correct
           </div>
+          <div className="power-stats">
+            {entry.last_5_form && (
+              <div className="form-row">
+                {entry.last_5_form.split('').map((r, i) => (
+                  <span key={i} className={`form-dot ${r === 'W' ? 'win' : 'loss'}`}>
+                    {r === 'W' ? '✓' : '✗'}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="power-badges">
+              {entry.current_streak > 1 && (
+                <span className="badge streak">🔥 {entry.current_streak}</span>
+              )}
+              {entry.accuracy_pct > 0 && (
+                <span className="badge accuracy">{entry.accuracy_pct}%</span>
+              )}
+              {entry.best_single_match > 0 && (
+                <span className="badge best">⚡{entry.best_single_match}pts best</span>
+              )}
+            </div>
+          </div>
         </div>
         <div>
           <div className="entry-points">{entry.total_points}</div>
