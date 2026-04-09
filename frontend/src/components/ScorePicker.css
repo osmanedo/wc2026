@@ -80,4 +80,26 @@
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.02em;
+  transition: opacity 0.15s;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.toast {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #1f2937;
+  color: #f9fafb;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  text-align: center;
+  animation: toast-in 0.2s ease;
 }

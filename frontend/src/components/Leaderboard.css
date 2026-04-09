@@ -2,6 +2,30 @@
   padding: 4px 0;
 }
 
+.skeleton-row {
+  height: 68px;
+  margin-bottom: 8px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.error-banner {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
 .leaderboard-title {
   font-family: 'Syne', sans-serif;
   font-size: 20px;

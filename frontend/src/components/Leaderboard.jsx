@@ -4,33 +4,70 @@ import './Leaderboard.css'
 
 export default function Leaderboard({ selectedGroup }) {
   const [entries, setEntries] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-useEffect(() => {
-  const fetchLeaderboard = async () => {
-    let query = supabase
-      .from("leaderboard")
-      .select(`*, profile:profiles(display_name)`)
-      .order("total_points", { ascending: false })
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      setLoading(true)
+      setError(null)
 
-    if (selectedGroup) {
-      // Step 1 — get member IDs for this group
-      const { data: members } = await supabase
-        .from("group_members")
-        .select("user_id")
-        .eq("group_id", selectedGroup.id)
+      let query = supabase
+        .from("leaderboard")
+        .select(`*, profile:profiles(display_name)`)
+        .order("total_points", { ascending: false })
 
-      const memberIds = members.map(m => m.user_id)
+      if (selectedGroup) {
+        const { data: members, error: membersError } = await supabase
+          .from("group_members")
+          .select("user_id")
+          .eq("group_id", selectedGroup.id)
 
-      // Step 2 — filter leaderboard to those IDs
-      query = query.in("user_id", memberIds)
+        if (membersError) {
+          setError('Could not load group members.')
+          setLoading(false)
+          return
+        }
+
+        const memberIds = members.map(m => m.user_id)
+        query = query.in("user_id", memberIds)
+      }
+
+      const { data, error: leaderboardError } = await query
+
+      if (leaderboardError) {
+        setError('Could not load leaderboard.')
+      } else {
+        setEntries(data || [])
+      }
+      setLoading(false)
     }
 
-    const { data } = await query
-    setEntries(data || [])
+    fetchLeaderboard()
+  }, [selectedGroup])
+
+  if (loading) {
+    return (
+      <div className="leaderboard">
+        <h2 className="leaderboard-title">Leaderboard</h2>
+        <p className="leaderboard-subtitle">
+          {selectedGroup ? selectedGroup.name : 'All Players'}
+        </p>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="skeleton-row" />
+        ))}
+      </div>
+    )
   }
 
-  fetchLeaderboard()
-}, [selectedGroup])
+  if (error) {
+    return (
+      <div className="leaderboard">
+        <h2 className="leaderboard-title">Leaderboard</h2>
+        <div className="error-banner">{error}</div>
+      </div>
+    )
+  }
 
   return (
   <div className="leaderboard">

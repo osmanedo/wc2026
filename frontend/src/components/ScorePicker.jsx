@@ -5,17 +5,26 @@ import './ScorePicker.css'
 export default function ScorePicker({ match, user, onPickSubmitted }) {
   const [homeScore, setHomeScore] = useState(0)
   const [awayScore, setAwayScore] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
+  const [toast, setToast] = useState(null)
+
+  const showToast = (msg) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 3000)
+  }
 
   const handleSubmit = async () => {
+    setSubmitting(true)
     const { error } = await supabase.from("picks").upsert({
       user_id: user.id,
       match_id: match.id,
       pick_home: homeScore,
       pick_away: awayScore
     }, { onConflict: 'user_id, match_id' })
+    setSubmitting(false)
 
     if (error) {
-      console.error('Error submitting pick:', error)
+      showToast('Failed to submit pick. Please try again.')
     } else {
       onPickSubmitted()
     }
@@ -43,9 +52,10 @@ export default function ScorePicker({ match, user, onPickSubmitted }) {
           </div>
         </div>
       </div>
-      <button className="submit-btn" onClick={handleSubmit}>
-        Submit Tip
+      <button className="submit-btn" onClick={handleSubmit} disabled={submitting}>
+        {submitting ? 'Submitting…' : 'Submit Tip'}
       </button>
+      {toast && <div className="toast">{toast}</div>}
     </div>
   )
 }

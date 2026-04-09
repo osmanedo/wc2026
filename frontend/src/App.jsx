@@ -9,11 +9,15 @@ import GroupPanel from './components/GroupPanel'
 export default function App() {
   const [view, setView] = useState('fixtures')
   const [matches, setMatches] = useState([])
+  const [loadingMatches, setLoadingMatches] = useState(true)
+  const [matchesError, setMatchesError] = useState(null)
   const [user, setUser] = useState(null)
   const [picks, setPicks] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [userGroups, setUserGroups] = useState([])
+  const [groupsError, setGroupsError] = useState(null)
   const [showGroupPanel, setShowGroupPanel] = useState(false)
+
   const matchesByDate = matches.reduce((groups, match) => {
     const date = new Date(match.kickoff_utc).toLocaleDateString('en-AU', {
       weekday: 'long',
@@ -25,9 +29,10 @@ export default function App() {
     groups[date].push(match)
     return groups
   }, {})
+
   const fetchPicks = () => {
     supabase.from("picks").select("*")
-      .then(({ data }) => setPicks(data))
+      .then(({ data }) => setPicks(data ?? []))
   }
 
   useEffect(() => {
@@ -41,7 +46,11 @@ export default function App() {
       *,
       home_team:teams!fk_home_team(name, flag_url),
       away_team:teams!fk_away_team(name, flag_url)
-    `).order('kickoff_utc', { ascending: true }).then(({ data }) => setMatches(data))
+    `).order('kickoff_utc', { ascending: true }).then(({ data, error }) => {
+      if (error) setMatchesError('Could not load fixtures. Please refresh.')
+      else setMatches(data ?? [])
+      setLoadingMatches(false)
+    })
 
     return () => subscription.unsubscribe()
   }, [])
@@ -52,7 +61,10 @@ export default function App() {
       .from("group_members")
       .select(`*, group:groups(id, name, code)`)
       .eq("user_id", user.id)
-      .then(({ data }) => setUserGroups(data?.map(m => m.group) || []))
+      .then(({ data, error }) => {
+        if (error) setGroupsError('Could not load your groups.')
+        else setUserGroups(data?.map(m => m.group) || [])
+      })
     fetchPicks()
   }, [user])
 
@@ -81,17 +93,28 @@ export default function App() {
       <main className="main">
         {view === 'fixtures' && (
           <div>
-            {Object.entries(matchesByDate).map(([date, dayMatches]) => (
-              <div key={date}>
-                <h3 className='date-header'>{date}</h3>
-                {dayMatches.map(match => (
-                  <MatchCard key={match.id} match={match} user={user}
-                    existingPick={picks.find(pick => pick.match_id === match.id)}
-                    onPickSubmitted={fetchPicks}
-                  />
-                ))}
-              </div>
-            ))}
+            {matchesError && (
+              <div className="error-banner">{matchesError}</div>
+            )}
+            {loadingMatches && !matchesError ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="skeleton-card" />
+              ))
+            ) : (
+              Object.entries(matchesByDate).map(([date, dayMatches]) => (
+                <div key={date}>
+                  <h3 className='date-header'>{date}</h3>
+                  <div className="match-grid">
+                    {dayMatches.map(match => (
+                      <MatchCard key={match.id} match={match} user={user}
+                        existingPick={picks.find(pick => pick.match_id === match.id)}
+                        onPickSubmitted={fetchPicks}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
 
@@ -99,13 +122,13 @@ export default function App() {
           <div>
             {user && userGroups.length > 0 && (
               <div className="group-tabs">
-                <button 
+                <button
                 className={`group-tab ${!selectedGroup ? 'active' : ''}`}
                   onClick={() => setSelectedGroup(null)}>
                   All Players
                 </button>
                 {userGroups.map(group => (
-                  <button 
+                  <button
                   key={group.id}
                   className={`group-tab ${selectedGroup?.id === group.id ? 'active' : ''}`}
                   onClick={() => setSelectedGroup(group)}>
@@ -126,8 +149,19 @@ export default function App() {
               + Create or Join a Group
             </button>
             {showGroupPanel && (
-              <GroupPanel user={user} onClose={() => setShowGroupPanel(false)} />
+              <GroupPanel user={user} onClose={() => {
+                setShowGroupPanel(false)
+                // Refresh groups after panel closes
+                if (user) {
+                  supabase
+                    .from("group_members")
+                    .select(`*, group:groups(id, name, code)`)
+                    .eq("user_id", user.id)
+                    .then(({ data }) => setUserGroups(data?.map(m => m.group) || []))
+                }
+              }} />
             )}
+            {groupsError && <div className="error-banner">{groupsError}</div>}
             <div className="my-groups-list">
               {userGroups.length === 0 ? (
                 <div className="no-groups">
