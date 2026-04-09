@@ -31,7 +31,7 @@ export default function AIBrief({ matchId, onClose }) {
     <div className="ai-brief-overlay" onClick={onClose}>
       <div className="ai-brief-modal" onClick={(e) => e.stopPropagation()}>
         <div className="ai-brief-header">
-          <span className="ai-brief-title">🤖 AI Brief</span>
+          <span className="ai-brief-title">AI Brief</span>
           <button className="ai-brief-close" onClick={onClose}>✕</button>
         </div>
 
@@ -40,7 +40,7 @@ export default function AIBrief({ matchId, onClose }) {
           {error && <p className="ai-brief-error">{error}</p>}
           {brief && (
             <>
-              <p className="ai-brief-text">{brief.pre_match_brief}</p>
+              <p className="ai-brief-text">{brief.pre_match_brief.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1')}</p>
               <p className="ai-brief-timestamp">
                 Generated {new Date(brief.generated_at).toLocaleDateString(undefined, {
                   day: 'numeric', month: 'short', year: 'numeric'

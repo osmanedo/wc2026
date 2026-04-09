@@ -46,7 +46,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
             setShowBrief(true)
           }}
         >
-          🤖 AI Brief
+          AI Brief & Prediction
         </button>
       </div>
 
