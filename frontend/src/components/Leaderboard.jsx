@@ -69,6 +69,22 @@ export default function Leaderboard({ selectedGroup }) {
     )
   }
 
+  if (entries.length === 0) {
+    return (
+      <div className="leaderboard">
+        <h2 className="leaderboard-title">Leaderboard</h2>
+        <p className="leaderboard-subtitle">
+          {selectedGroup ? selectedGroup.name : 'All Players'}
+        </p>
+        <div className="empty-state">
+          <div className="empty-state-icon">🏆</div>
+          <div className="empty-state-title">No picks submitted yet</div>
+          <div className="empty-state-body">Get tipping! Rankings will appear once matches are played.</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
   <div className="leaderboard">
     <h2 className="leaderboard-title">Leaderboard</h2>

@@ -8,6 +8,10 @@
   transition: box-shadow 0.2s;
 }
 
+.match-card.no-tip {
+  cursor: default;
+}
+
 .match-card:active {
   box-shadow: var(--shadow-md);
 }
@@ -115,6 +119,11 @@
   font-size: 11px;
   color: var(--gray-400);
   text-align: center;
+}
+
+.pick-prompt.sign-in {
+  color: var(--green-accent);
+  font-weight: 500;
 }
 
 .pick-prompt.countdown {

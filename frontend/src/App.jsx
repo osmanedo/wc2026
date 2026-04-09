@@ -5,6 +5,7 @@ import Auth from './components/Auth'
 import MatchCard from './components/MatchCard'
 import Leaderboard from './components/Leaderboard'
 import GroupPanel from './components/GroupPanel'
+import HowItWorks from './components/HowItWorks'
 
 export default function App() {
   const [view, setView] = useState('fixtures')
@@ -17,6 +18,10 @@ export default function App() {
   const [userGroups, setUserGroups] = useState([])
   const [groupsError, setGroupsError] = useState(null)
   const [showGroupPanel, setShowGroupPanel] = useState(false)
+  const [showGroupSignIn, setShowGroupSignIn] = useState(false)
+  const [showHowItWorks, setShowHowItWorks] = useState(
+    () => !localStorage.getItem('wc2026_welcomed')
+  )
 
   const matchesByDate = matches.reduce((groups, match) => {
     const date = new Date(match.kickoff_utc).toLocaleDateString('en-AU', {
@@ -138,6 +143,9 @@ export default function App() {
               </div>
             )}
             <Leaderboard selectedGroup={selectedGroup} />
+            <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
+              How it works
+            </button>
           </div>
         )}
 
@@ -145,13 +153,24 @@ export default function App() {
           <div className="groups-view">
             <h2 className="groups-title">My Groups</h2>
             <p className="groups-subtitle">Create or join a group to compete with friends</p>
-            <button className="create-join-btn" onClick={() => setShowGroupPanel(true)}>
+            <button className="create-join-btn" onClick={() => {
+              if (!user) { setShowGroupSignIn(true); return }
+              setShowGroupSignIn(false)
+              setShowGroupPanel(true)
+            }}>
               + Create or Join a Group
             </button>
+            {showGroupSignIn && !user && (
+              <div className="empty-state sign-in-prompt">
+                <div className="empty-state-icon">👥</div>
+                <div className="empty-state-title">Sign in to continue</div>
+                <div className="empty-state-body">You need to be signed in to create or join a group.</div>
+                <Auth />
+              </div>
+            )}
             {showGroupPanel && (
               <GroupPanel user={user} onClose={() => {
                 setShowGroupPanel(false)
-                // Refresh groups after panel closes
                 if (user) {
                   supabase
                     .from("group_members")
@@ -164,8 +183,10 @@ export default function App() {
             {groupsError && <div className="error-banner">{groupsError}</div>}
             <div className="my-groups-list">
               {userGroups.length === 0 ? (
-                <div className="no-groups">
-                  You haven't joined any groups yet
+                <div className="empty-state">
+                  <div className="empty-state-icon">👥</div>
+                  <div className="empty-state-title">You're not in a group yet</div>
+                  <div className="empty-state-body">Create or join one above to compete with friends.</div>
                 </div>
               ) : (
                 userGroups.map(group => (
@@ -179,9 +200,19 @@ export default function App() {
                 ))
               )}
             </div>
+            <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
+              How it works
+            </button>
           </div>
         )}
       </main>
+
+      {showHowItWorks && (
+        <HowItWorks onClose={() => {
+          localStorage.setItem('wc2026_welcomed', '1')
+          setShowHowItWorks(false)
+        }} />
+      )}
 
       {/* Bottom Nav */}
       <nav className="bottom-nav">

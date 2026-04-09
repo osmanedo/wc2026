@@ -38,7 +38,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
   }
 
   return (
-    <div className="match-card" onClick={() => isTimed && user && setShowPicker(true)}>
+    <div className={`match-card${isTimed && !user ? ' no-tip' : ''}`} onClick={() => isTimed && user && setShowPicker(true)}>
       <div className="match-teams">
         <img className="team-flag" src={match.home_team.flag_url} alt={`${match.home_team.name} flag`} />
         <span className="team-name">{match.home_team.name}</span>
@@ -85,9 +85,11 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
         <div className={`pick-prompt countdown${isUrgent ? ' urgent' : ''}`}>
           ⏱ {getCountdown()}
         </div>
-      ) : (
-        isTimed && user && <div className="pick-prompt">Tap to tip</div>
-      )}
+      ) : isTimed && user ? (
+        <div className="pick-prompt">Tap to tip</div>
+      ) : isTimed && !user ? (
+        <div className="pick-prompt sign-in">Sign in to start tipping</div>
+      ) : null}
 
       {showPicker && (
         <div onClick={(e) => e.stopPropagation()}>
