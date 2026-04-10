@@ -4,8 +4,6 @@ import { Analytics } from "@vercel/analytics/react"
 import './index.css'
 import App from './App.jsx'
 
-inject()
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
