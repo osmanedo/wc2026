@@ -127,7 +127,7 @@ export default function App() {
       {showInstallBanner && (
         <div className="install-banner">
           <span className="install-banner-text">
-            📲 Add WC2026 Fantasy to your homescreen for the best experience
+            Add WC2026 Fantasy App to your homescreen for the best experience
           </span>
           <button className="install-banner-btn" onClick={handleInstall}>Install</button>
           <button className="install-banner-dismiss" onClick={dismissInstallBanner}>✕</button>
@@ -240,7 +240,7 @@ export default function App() {
               {userGroups.length === 0 ? (
                 <div className="empty-state">
                   <div className="empty-state-icon">👥</div>
-                  <div className="empty-state-title">You're not in a group yet</div>
+                  <div className="empty-state-title">You are not in a group yet</div>
                   <div className="empty-state-body">Create or join one above to compete with friends.</div>
                 </div>
               ) : (
@@ -278,7 +278,7 @@ export default function App() {
       {/* Bottom Nav */}
       <nav className="bottom-nav">
         <button onClick={() => setView('fixtures')} className={view === 'fixtures' ? 'active' : ''}>
-          🏟️ Fixtures
+          📆 Fixtures
         </button>
         <button onClick={() => setView('leaderboard')} className={view === 'leaderboard' ? 'active' : ''}>
           🏆 Leaderboard
