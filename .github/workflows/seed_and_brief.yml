@@ -7,19 +7,20 @@ jobs:
   seed-and-brief:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install dependencies
         run: |
-          pip install requests python-dotenv anthropic
+          pip install requests python-dotenv
           pip install "httpcore==0.17.3" "httpx==0.24.1"
           pip install "supabase==2.3.0" --no-deps
           pip install "gotrue==1.3.0" "postgrest==0.13.2" "realtime==1.0.2" "storage3==0.5.4" "supafunc==0.3.1"
+          pip install "anthropic==0.18.1"
 
       - name: Seed new matches from API
         env:
