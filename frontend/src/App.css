@@ -51,7 +51,7 @@
 .user-bar {
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 72%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
