@@ -86,17 +86,31 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
-    supabase.from("matches").select(`
-      *,
-      home_team:teams!fk_home_team(name, flag_url),
-      away_team:teams!fk_away_team(name, flag_url)
-    `).order('kickoff_utc', { ascending: true }).then(({ data, error }) => {
-      if (error) setMatchesError('Could not load fixtures. Please refresh.')
-      else setMatches(data ?? [])
-      setLoadingMatches(false)
-    })
+    const fetchMatches = () =>
+      supabase.from("matches").select(`
+        *,
+        home_team:teams!fk_home_team(name, flag_url),
+        away_team:teams!fk_away_team(name, flag_url)
+      `).order('kickoff_utc', { ascending: true }).then(({ data, error }) => {
+        if (error) setMatchesError('Could not load fixtures. Please refresh.')
+        else setMatches(data ?? [])
+        setLoadingMatches(false)
+      })
 
-    return () => subscription.unsubscribe()
+    fetchMatches()
+
+    const matchPollInterval = setInterval(() => {
+      setMatches(current => {
+        if (current.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED'))
+          fetchMatches()
+        return current
+      })
+    }, 30_000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearInterval(matchPollInterval)
+    }
   }, [])
 
   useEffect(() => {
@@ -197,7 +211,10 @@ export default function App() {
               ))}
               </div>
             )}
-            <Leaderboard selectedGroup={selectedGroup} />
+            <Leaderboard
+              selectedGroup={selectedGroup}
+              hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
+            />
             <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
               How it works
             </button>

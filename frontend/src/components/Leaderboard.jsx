@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import './Leaderboard.css'
 
-export default function Leaderboard({ selectedGroup }) {
+export default function Leaderboard({ selectedGroup, hasLiveMatch }) {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -47,7 +47,11 @@ export default function Leaderboard({ selectedGroup }) {
     }
 
     fetchLeaderboard()
-  }, [selectedGroup])
+
+    if (!hasLiveMatch) return
+    const interval = setInterval(fetchLeaderboard, 30_000)
+    return () => clearInterval(interval)
+  }, [selectedGroup, hasLiveMatch])
 
   if (loading) {
     return (
