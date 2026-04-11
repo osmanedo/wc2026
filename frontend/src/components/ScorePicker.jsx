@@ -24,7 +24,7 @@ export default function ScorePicker({ match, user, onPickSubmitted }) {
     setSubmitting(false)
 
     if (error) {
-      showToast('Failed to submit pick. Please try again.')
+      showToast('Failed to submit pick.')
     } else {
       onPickSubmitted()
     }
