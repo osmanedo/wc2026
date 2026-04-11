@@ -49,7 +49,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
             <span className="kickoff-time">{kickoff}</span>
           )}
             <span className="timezone-label">
-              {Intl.DateTimeFormat().resolvedOptions().timeZone.replace('Australia/', '')}
+              Your time ({Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g, ' ')})
             </span>
           <span className={`status-badge ${match.status.toLowerCase()}`}>
             {isFinished ? 'FT' : match.status === 'TIMED' ? 'vs' : match.status}
@@ -57,19 +57,6 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
         </div>
         <span className="team-name right">{match.away_team.name}</span>
         <img className="team-flag" src={match.away_team.flag_url} alt={`${match.away_team.name} flag`} />
-      </div>
-
-      {/* AI Brief trigger button */}
-      <div className="ai-brief-row">
-        <button
-          className="ai-brief-btn"
-          onClick={(e) => {
-            e.stopPropagation()
-            setShowBrief(true)
-          }}
-        >
-          AI Brief & Prediction
-        </button>
       </div>
 
       {existingPick ? (
@@ -86,10 +73,25 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
           ⏱ {getCountdown()}
         </div>
       ) : isTimed && user ? (
-        <div className="pick-prompt">Tap to tip</div>
+        <div className="pick-prompt tap-to-tip">Tap to tip</div>
       ) : isTimed && !user ? (
         <div className="pick-prompt sign-in">Sign in to start tipping</div>
       ) : null}
+
+      {/* AI Brief trigger button */}
+      {!existingPick && !isLocked && (
+        <div className="ai-brief-row">
+          <button
+            className="ai-brief-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowBrief(true)
+            }}
+          >
+            AI Brief & Prediction
+          </button>
+        </div>
+      )}
 
       {showPicker && (
         <div onClick={(e) => e.stopPropagation()}>

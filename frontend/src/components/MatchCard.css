@@ -69,9 +69,10 @@
 }
 
 .timezone-label {
-  font-size: 9px;
+  font-size: 10px;
   color: var(--gray-400);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .score {
@@ -119,6 +120,26 @@
   font-size: 11px;
   color: var(--gray-400);
   text-align: center;
+}
+
+@keyframes tip-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(26, 71, 42, 0.25); }
+  50%       { box-shadow: 0 0 0 5px rgba(26, 71, 42, 0); }
+}
+
+.pick-prompt.tap-to-tip {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 0;
+  background: transparent;
+  border: 1.5px solid var(--green);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  text-align: center;
+  animation: tip-pulse 2s ease-in-out infinite;
 }
 
 .pick-prompt.sign-in {
