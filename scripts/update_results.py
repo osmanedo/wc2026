@@ -30,27 +30,37 @@ response = requests.get(
 
 results_data = response.json()
 
-# Step 5 — loop through matches, detect newly finished
+# Step 5 — loop through matches and sync scores + status
+# FINISHED:      write final scores, calculate points, flag for summary generation
+# IN_PLAY/PAUSED: write live scores and status so leaderboard view reflects current game
 newly_finished = []
 
-for results in results_data["matches"]:
-    if results["status"] == "FINISHED":
+for match in results_data["matches"]:
+    status = match["status"]
+    score  = match["score"]["fullTime"]
+
+    if status == "FINISHED":
         supabase.table("matches").update({
-            "home_score": results["score"]["fullTime"]["home"],
-            "away_score": results["score"]["fullTime"]["away"],
-            "status": results["status"]
-        }).eq("id", results["id"]).execute()
+            "home_score": score["home"],
+            "away_score": score["away"],
+            "status": status
+        }).eq("id", match["id"]).execute()
 
-        supabase.rpc("calculate_points", {"match_id_input": results["id"]}).execute()
+        supabase.rpc("calculate_points", {"match_id_input": match["id"]}).execute()
 
-        # If this match wasn't FINISHED before, it just completed
-        if results["id"] not in already_finished_ids:
-            newly_finished.append(results["id"])
+        if match["id"] not in already_finished_ids:
+            newly_finished.append(match["id"])
 
-# Step 6 — refresh leaderboard
-supabase.rpc("refresh_leaderboard", {}).execute()
+    elif status in ("IN_PLAY", "PAUSED"):
+        # score.fullTime holds the current live score in football-data.org v4
+        supabase.table("matches").update({
+            "home_score": score["home"],
+            "away_score": score["away"],
+            "status": status
+        }).eq("id", match["id"]).execute()
 
-# Step 7 — generate post-match summaries for newly finished matches
+# Step 6 — generate post-match summaries for newly finished matches
+# Note: refresh_leaderboard() removed — leaderboard is now a live view
 for match_id in newly_finished:
     try:
         generate_summary(match_id)

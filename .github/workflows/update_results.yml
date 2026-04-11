@@ -1,8 +1,8 @@
 name: Update Match Results
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'   # every 5 minutes during matches
+  ## schedule:
+  ##  - cron: '*/1 * * * *'   # every 1 minute during matches - Uncomment and adjust on June 12, 2026 and on every game!
   workflow_dispatch:          # allows manual trigger from GitHub
 
 jobs:
