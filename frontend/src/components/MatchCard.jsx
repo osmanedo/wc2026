@@ -38,7 +38,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
   }
 
   return (
-    <div className={`match-card${isTimed && !user ? ' no-tip' : ''}`} onClick={() => isTimed && user && setShowPicker(true)}>
+    <div className="match-card">
       <div className="match-teams">
         <img className="team-flag" src={match.home_team.flag_url} alt={`${match.home_team.name} flag`} />
         <span className="team-name">{match.home_team.name}</span>
@@ -69,11 +69,11 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
       ) : isLocked ? (
         <div className="locked-badge">🔒 Locked</div>
       ) : isTimed && user && isUnder24h ? (
-        <div className={`pick-prompt countdown${isUrgent ? ' urgent' : ''}`}>
+        <div className={`pick-prompt countdown${isUrgent ? ' urgent' : ''}`} style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>
           ⏱ {getCountdown()}
         </div>
       ) : isTimed && user ? (
-        <div className="pick-prompt tap-to-tip">Tap to tip</div>
+        <div className="pick-prompt tap-to-tip" style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>Tap to tip</div>
       ) : isTimed && !user ? (
         <div className="pick-prompt sign-in">Sign in to start tipping</div>
       ) : null}

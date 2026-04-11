@@ -4,16 +4,7 @@
   padding: 16px;
   margin-bottom: 8px;
   box-shadow: var(--shadow-sm);
-  cursor: pointer;
   transition: box-shadow 0.2s;
-}
-
-.match-card.no-tip {
-  cursor: default;
-}
-
-.match-card:active {
-  box-shadow: var(--shadow-md);
 }
 
 .match-teams {
