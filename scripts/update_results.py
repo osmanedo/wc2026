@@ -65,7 +65,9 @@ for match_id in newly_finished:
     try:
         generate_summary(match_id)
     except Exception as e:
-        print(f"  ✗ Summary error for match {match_id}: {e}")
+        # generate_summary already retried MAX_RETRIES times — log and move on.
+        # The frontend falls back to pre_match_brief until a later run succeeds.
+        print(f"  ✗ Summary permanently failed for match {match_id}: {e}")
 
 if newly_finished:
     print(f"\n{len(newly_finished)} new match(es) finished — summaries generated")
