@@ -10,14 +10,22 @@ Usage:
 """
 
 import os
+import sys
 import argparse
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from dotenv import load_dotenv
 from supabase import create_client
 import anthropic
 
+# Ensure UTF-8 output on Windows
+if sys.stdout.encoding != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8")
+
 # ── Step 1: Load environment variables ──────────────────────────────
-load_dotenv()
+# Look for .env in the scripts dir first, then the repo root
+load_dotenv(Path(__file__).parent / ".env", override=True)
+load_dotenv(Path(__file__).parent.parent / ".env", override=True)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
