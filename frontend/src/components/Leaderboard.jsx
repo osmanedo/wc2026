@@ -84,7 +84,15 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch }) {
           {selectedGroup ? selectedGroup.name : 'All Players'}
         </p>
         <div className="empty-state">
-          <div className="empty-state-icon">🏆</div>
+          <div className="empty-state-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/>
+              <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/>
+              <path d="M6 3h12v10a6 6 0 0 1-12 0V3z"/>
+              <path d="M12 19v2"/>
+              <path d="M8 21h8"/>
+            </svg>
+          </div>
           <div className="empty-state-title">No picks submitted yet</div>
           <div className="empty-state-body">Get tipping! Rankings will appear once matches are played.</div>
         </div>
@@ -113,7 +121,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch }) {
       }
 
       return (
-      <div key={entry.user_id} className={`leaderboard-entry ${index < 3 ? 'top' : ''}`}>
+      <div key={entry.user_id} className={`leaderboard-entry${index === 0 ? ' top-1' : index === 1 ? ' top-2' : index === 2 ? ' top-3' : ''}`}>
         <div className={`rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}`}>
           {index + 1}
         </div>
@@ -131,21 +139,19 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch }) {
             {entry.last_5_form && (
               <div className="form-row">
                 {entry.last_5_form.split('').map((r, i) => (
-                  <span key={i} className={`form-dot ${r === 'W' ? 'win' : 'loss'}`}>
-                    {r === 'W' ? '✓' : '✗'}
-                  </span>
+                  <span key={i} className={`form-dot ${r === 'W' ? 'win' : 'loss'}`} />
                 ))}
               </div>
             )}
             <div className="power-badges">
               {entry.current_streak > 1 && (
-                <span className="badge streak">🔥{entry.current_streak}</span>
+                <span className="badge streak">{entry.current_streak} streak</span>
               )}
               {entry.accuracy_pct > 0 && (
                 <span className="badge accuracy">{entry.accuracy_pct}%</span>
               )}
               {entry.best_single_match > 0 && (
-                <span className="badge best">⚡{entry.best_single_match}pts best</span>
+                <span className="badge best">{entry.best_single_match} best</span>
               )}
             </div>
           </div>

@@ -215,6 +215,12 @@ export default function App() {
               selectedGroup={selectedGroup}
               hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
             />
+            {!user && (
+              <div className="leaderboard-signin-cta">
+                <p className="leaderboard-signin-cta-text">Submit picks and climb the rankings</p>
+                <Auth />
+              </div>
+            )}
             <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
               How it works
             </button>
