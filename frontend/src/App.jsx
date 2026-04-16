@@ -35,13 +35,14 @@ export default function App() {
   const [showInstallBanner, setShowInstallBanner] = useState(false)
 
   useEffect(() => {
-    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
-    if (!isMobile || localStorage.getItem('wc2026_install_dismissed')) return
+    if (localStorage.getItem('wc2026_install_dismissed')) return
+
+    // Show banner immediately; also capture native install prompt if available
+    setShowInstallBanner(true)
 
     const handler = (e) => {
       e.preventDefault()
       setInstallPrompt(e)
-      setShowInstallBanner(true)
     }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
@@ -143,7 +144,7 @@ export default function App() {
           <span className="install-banner-text">
             Add WC2026 Fantasy App to your homescreen for the best experience
           </span>
-          <button className="install-banner-btn" onClick={handleInstall}>Install</button>
+          {installPrompt && <button className="install-banner-btn" onClick={handleInstall}>Install</button>}
           <button className="install-banner-dismiss" onClick={dismissInstallBanner}>✕</button>
         </div>
       )}
