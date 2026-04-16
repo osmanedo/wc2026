@@ -144,7 +144,7 @@ export default function App() {
           <span className="install-banner-text">
             Add WC2026 Fantasy App to your homescreen for the best experience
           </span>
-          {installPrompt && <button className="install-banner-btn" onClick={handleInstall}>Install</button>}
+          <button className="install-banner-btn" onClick={handleInstall} disabled={!installPrompt}>Install</button>
           <button className="install-banner-dismiss" onClick={dismissInstallBanner}>✕</button>
         </div>
       )}
