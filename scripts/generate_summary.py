@@ -74,7 +74,7 @@ Remember: plain sentences only, no markdown, no lists, no formatting symbols wha
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             response = claude.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-6",
                 max_tokens=300,
                 system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": prompt}],

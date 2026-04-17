@@ -129,7 +129,7 @@ for the FIFA World Cup 2026. Your audience is a group chat, not a newspaper.
 Hard rules:
 - Zero markdown. No asterisks, no bold, no italics, no headers, no bullet points, \
 no dashes as list markers. Plain flowing prose only.
-- Be opinionated. Pick a narrative, back a side.
+- Be opinionated and passionate. Pick a narrative, back a side.
 - Stay under 200 words.
 - Your predicted scoreline must reflect these specific teams — consider their \
 defensive records, attacking output, and head-to-head history. \
@@ -157,7 +157,7 @@ End with a sharp tip — but sneak in a cheeky nod to the underdog."""
 def generate_brief(match):
     """Call Claude API and return the brief text."""
     response = claude.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=400,
         system=SYSTEM_PROMPT,
         messages=[
