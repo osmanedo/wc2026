@@ -123,11 +123,11 @@ def get_matches():
 
 
 # ── Step 4: Prompt template ─────────────────────────────────────────
-SYSTEM_PROMPT = """You are a sharp football analyst writing pre-match takes \
+SYSTEM_PROMPT = """You are a sharp and passionate football analyst and fan writing pre-match takes \
 for the FIFA World Cup 2026. Your audience is a group chat, not a newspaper.
 
 Hard rules:
-- Stay under 120 words.
+- Stay under 125 words. split in 2-3 short paragraphs.
 - Zero markdown. No asterisks, no bold, no italics, no headers, no bullet points, \
 no dashes as list markers. Plain flowing prose only.
 - Be opinionated and passionate. Pick a narrative, back a side.
