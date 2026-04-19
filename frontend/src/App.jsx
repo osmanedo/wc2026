@@ -1,5 +1,15 @@
 import './App.css'
 import { useState, useEffect } from 'react'
+
+const ROUND_ORDER = ['GROUP_STAGE', 'LAST_32', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 'FINAL']
+const ROUND_LABELS = {
+  GROUP_STAGE: 'Group Stage',
+  LAST_32: 'Round of 32',
+  LAST_16: 'Round of 16',
+  QUARTER_FINALS: 'Quarter Finals',
+  SEMI_FINALS: 'Semi Finals',
+  FINAL: 'Final',
+}
 import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import MatchCard from './components/MatchCard'
@@ -19,6 +29,10 @@ export default function App() {
   const [groupsError, setGroupsError] = useState(null)
   const [displayName, setDisplayName] = useState(null)
   const [copiedCode, setCopiedCode] = useState(null)
+  const [filterDate, setFilterDate] = useState('all')
+  const [filterTeam, setFilterTeam] = useState('all')
+  const [filterRound, setFilterRound] = useState('all')
+  const [filterGroup, setFilterGroup] = useState('all')
 
   const copyCode = (code) => {
     navigator.clipboard.writeText(code).then(() => {
@@ -63,13 +77,32 @@ export default function App() {
     setShowInstallBanner(false)
   }
 
-  const matchesByDate = matches.reduce((groups, match) => {
-    const date = new Date(match.kickoff_utc).toLocaleDateString('en-AU', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
-    })
+  const toDateLabel = (kickoff) => new Date(kickoff).toLocaleDateString('en-AU', {
+    weekday: 'long', day: 'numeric', month: 'long',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  })
+
+  const allDateLabels = [...new Set(matches.map(m => toDateLabel(m.kickoff_utc)))]
+
+  const availableRounds = [...new Set(matches.map(m => m.stage))]
+    .sort((a, b) => ROUND_ORDER.indexOf(a) - ROUND_ORDER.indexOf(b))
+
+  const availableTeams = [...new Set(
+    matches.flatMap(m => [m.home_team?.name, m.away_team?.name]).filter(Boolean)
+  )].sort()
+
+  const availableGroups = [...new Set(matches.map(m => m.group_name).filter(Boolean))].sort()
+
+  const filteredMatches = matches.filter(m => {
+    if (filterRound !== 'all' && m.stage !== filterRound) return false
+    if (filterTeam !== 'all' && m.home_team?.name !== filterTeam && m.away_team?.name !== filterTeam) return false
+    if (filterDate !== 'all' && toDateLabel(m.kickoff_utc) !== filterDate) return false
+    if (filterGroup !== 'all' && m.group_name !== filterGroup) return false
+    return true
+  })
+
+  const matchesByDate = filteredMatches.reduce((groups, match) => {
+    const date = toDateLabel(match.kickoff_utc)
     if (!groups[date]) groups[date] = []
     groups[date].push(match)
     return groups
@@ -171,10 +204,45 @@ export default function App() {
             {matchesError && (
               <div className="error-banner">{matchesError}</div>
             )}
+            {!loadingMatches && matches.length > 0 && (
+              <div className="fixtures-filters-row">
+                <div className="fixtures-filters">
+                  <select value={filterRound} onChange={e => setFilterRound(e.target.value)}>
+                    <option value="all">All Rounds</option>
+                    {availableRounds.map(r => (
+                      <option key={r} value={r}>{ROUND_LABELS[r] ?? r}</option>
+                    ))}
+                  </select>
+                  <select value={filterTeam} onChange={e => setFilterTeam(e.target.value)}>
+                    <option value="all">All Teams</option>
+                    {availableTeams.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                  <select value={filterDate} onChange={e => setFilterDate(e.target.value)}>
+                    <option value="all">All Dates</option>
+                    {allDateLabels.map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                  {availableGroups.length > 0 && (
+                    <select value={filterGroup} onChange={e => setFilterGroup(e.target.value)}>
+                      <option value="all">All Groups</option>
+                      {availableGroups.map(g => (
+                        <option key={g} value={g}>{g}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <button className="hiw-icon-btn" onClick={() => setShowHowItWorks(true)} title="How it works">ⓘ</button>
+              </div>
+            )}
             {loadingMatches && !matchesError ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="skeleton-card" />
               ))
+            ) : Object.keys(matchesByDate).length === 0 && !matchesError ? (
+              <p className="no-results">No fixtures match your filters.</p>
             ) : (
               Object.entries(matchesByDate).map(([date, dayMatches]) => (
                 <div key={date}>

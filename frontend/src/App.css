@@ -82,6 +82,79 @@
   padding: 16px;
 }
 
+/* Fixtures filters */
+.fixtures-filters-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.fixtures-filters {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hiw-icon-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-400);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.hiw-icon-btn:hover {
+  color: var(--green);
+  border-color: var(--green-accent);
+}
+
+.fixtures-filters select {
+  flex: 1;
+  min-width: 120px;
+  padding: 7px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-600);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.fixtures-filters select:focus {
+  outline: none;
+  border-color: var(--green-accent);
+  color: var(--gray-900);
+}
+
+.fixtures-filters select:has(option:checked:not([value="all"])) {
+  background: var(--green);
+  color: var(--white);
+  border-color: var(--green);
+}
+
+.no-results {
+  text-align: center;
+  color: var(--gray-600);
+  padding: 40px 0;
+  font-size: 14px;
+}
+
 /* Date header */
 .date-header {
   font-family: 'Syne', sans-serif;
