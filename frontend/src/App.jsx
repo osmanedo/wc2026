@@ -40,6 +40,7 @@ export default function App() {
       setTimeout(() => setCopiedCode(null), 2000)
     })
   }
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const [showGroupPanel, setShowGroupPanel] = useState(false)
   const [showGroupSignIn, setShowGroupSignIn] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(
@@ -188,7 +189,7 @@ export default function App() {
           <img src="/fifa-world-cup-2026-logo.png" alt="WC2026 Logo" className="logo" />
           <h1>World Cup 2026 Fantasy</h1>
         </div>
-        {!user && <Auth className="signin-btn"/>}
+        {!user && <button className="signin-btn" onClick={() => setShowAuthModal(true)}>Sign in</button>}
         {user && (
           <div className="user-bar">
             <span>{displayName ?? user.email}</span>
@@ -355,6 +356,15 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {showAuthModal && (
+        <div className="auth-modal-overlay" onClick={() => setShowAuthModal(false)}>
+          <div className="auth-modal" onClick={e => e.stopPropagation()}>
+            <button className="auth-modal-close" onClick={() => setShowAuthModal(false)}>✕</button>
+            <Auth onSuccess={() => setShowAuthModal(false)} />
+          </div>
+        </div>
+      )}
 
       {showHowItWorks && (
         <HowItWorks onClose={() => {

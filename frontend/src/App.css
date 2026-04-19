@@ -300,6 +300,40 @@
   border: none;
 }
 
+/* Auth modal */
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+
+.auth-modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px 20px 20px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: var(--shadow-md);
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--gray-400);
+  cursor: pointer;
+  line-height: 1;
+}
+
 /* Error banner */
 .error-banner {
   background: #fef2f2;
