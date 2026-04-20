@@ -18,9 +18,9 @@ export default function GroupPanel({ user, onClose }) {
       .from("groups")
       .select("id")
       .ilike("name", groupName.trim())
-      .maybeSingle()
+      .limit(1)
 
-    if (existing) {
+    if (existing?.length > 0) {
       setMessage("A group with that name already exists")
       return
     }
