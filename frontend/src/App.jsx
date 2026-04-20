@@ -178,6 +178,10 @@ export default function App() {
     fetchPicks()
   }, [user])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [view])
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
   }
