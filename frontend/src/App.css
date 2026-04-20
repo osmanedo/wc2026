@@ -49,31 +49,42 @@
 }
 
 .user-bar {
-  position: absolute;
-  right: 10px;
-  top: 72%;
-  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
   display: flex;
   align-items: center;
-  gap: 10px;
-  opacity: 0.72;
-}
-
-.user-bar span {
+  justify-content: center;
   font-size: 12px;
+  font-weight: 600;
   color: var(--white);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
 }
 
-.user-bar button {
-  font-size: 11px;
+.user-avatar:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.signout-btn {
+  font-size: 10px;
   color: var(--green-accent);
   background: none;
   border: 1px solid var(--green-accent);
   border-radius: 18px;
-  padding: 3px 10px;
-  display: flex;
-  align-items: bottom;
-  gap: 5px;
+  padding: 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.4;
 }
 
 /* Main */
@@ -158,12 +169,22 @@
 /* Date header */
 .date-header {
   font-family: 'Syne', sans-serif;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--gray-600);
+  color: var(--gray-400);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin: 20px 0 10px;
+  margin: 20px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
 }
 
 .date-header:first-child { margin-top: 0; }
@@ -387,14 +408,6 @@
 
   .header h1 {
     font-size: 28px;
-  }
-
-  /* User bar: flow inline instead of absolute */
-  .user-bar {
-    position: static;
-    transform: none;
-    opacity: 1;
-    margin-left: auto;
   }
 
   .main {

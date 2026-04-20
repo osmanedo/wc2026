@@ -154,9 +154,20 @@ export default function App() {
       .from("group_members")
       .select(`*, group:groups(id, name, code)`)
       .eq("user_id", user.id)
-      .then(({ data, error }) => {
-        if (error) setGroupsError('Could not load your groups.')
-        else setUserGroups(data?.map(m => m.group) || [])
+      .then(async ({ data, error }) => {
+        if (error) { setGroupsError('Could not load your groups.'); return }
+        const groups = data?.map(m => m.group) || []
+        if (groups.length === 0) { setUserGroups([]); return }
+        const groupIds = groups.map(g => g.id)
+        const { data: countRows } = await supabase
+          .from("group_members")
+          .select("group_id")
+          .in("group_id", groupIds)
+        const countMap = (countRows || []).reduce((acc, r) => {
+          acc[r.group_id] = (acc[r.group_id] || 0) + 1
+          return acc
+        }, {})
+        setUserGroups(groups.map(g => ({ ...g, member_count: countMap[g.id] || 0 })))
       })
     supabase
       .from("profiles")
@@ -192,8 +203,16 @@ export default function App() {
         {!user && <button className="signin-btn" onClick={() => setShowAuthModal(true)}>Sign in</button>}
         {user && (
           <div className="user-bar">
-            <span>{displayName ?? user.email}</span>
-            <button onClick={handleLogout}>Sign Out</button>
+            <div className="user-avatar" title={displayName ?? user.email}>
+              {(() => {
+                const name = displayName ?? user.email ?? ''
+                const parts = name.split(/[\s@]/).filter(Boolean)
+                return parts.length >= 2
+                  ? (parts[0][0] + parts[1][0]).toUpperCase()
+                  : name.slice(0, 2).toUpperCase()
+              })()}
+            </div>
+            <button className="signout-btn" onClick={handleLogout}>Sign Out</button>
           </div>
         )}
       </header>
@@ -253,6 +272,7 @@ export default function App() {
                       <MatchCard key={match.id} match={match} user={user}
                         existingPick={picks.find(pick => pick.match_id === match.id)}
                         onPickSubmitted={fetchPicks}
+                        onSignIn={() => setShowAuthModal(true)}
                       />
                     ))}
                   </div>
@@ -341,7 +361,7 @@ export default function App() {
                   <div key={group.id} className="group-card">
                     <div>
                       <div className="group-card-name">{group.name}</div>
-                      <div className="group-card-code">Tap code to copy</div>
+                      <div className="group-card-code">{group.member_count != null ? `${group.member_count} members` : 'Tap code to copy'}</div>
                     </div>
                     <button className={`code-badge${copiedCode === group.code ? ' copied' : ''}`} onClick={() => copyCode(group.code)}>
                       {copiedCode === group.code ? 'Copied!' : group.code}

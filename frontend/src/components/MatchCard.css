@@ -7,6 +7,10 @@
   transition: box-shadow 0.2s;
 }
 
+.match-card.finished {
+  border-left: 3px solid var(--green-accent);
+}
+
 .match-teams {
   display: flex;
   align-items: center;
@@ -133,9 +137,11 @@
 }
 
 .pick-prompt.tap-to-tip {
-  display: block;
-  width: 100%;
-  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  margin-top: 0;
   padding: 9px 0;
   background: transparent;
   border: 1.5px solid var(--green);
@@ -148,8 +154,20 @@
 }
 
 .pick-prompt.sign-in {
-  color: var(--green-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 9px 0;
+  border: 1.5px solid var(--green-accent);
+  border-radius: 999px;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
   font-weight: 500;
+  color: var(--green-accent);
+  text-align: center;
+  cursor: pointer;
 }
 
 .pick-prompt.countdown {
@@ -182,8 +200,20 @@
   color: var(--gray-600);
 }
 
-.ai-brief-row {
+.pick-action-row {
   display: flex;
-  justify-content: center;
-  margin: 6px 0;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pick-action-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.pick-action-left .pick-display,
+.pick-action-left .pick-prompt,
+.pick-action-left .locked-badge {
+  margin-top: 0;
 }

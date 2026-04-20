@@ -100,14 +100,43 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch }) {
     )
   }
 
+  const top3 = entries.slice(0, 3)
+  const rest = entries.slice(3)
+  const podiumColors = ['#f59e0b', '#94a3b8', '#b45309']
+
   return (
   <div className="leaderboard">
     <h2 className="leaderboard-title">Leaderboard</h2>
     <p className="leaderboard-subtitle">
       {selectedGroup ? selectedGroup.name : 'All Players'}
     </p>
-    {entries.map((entry, index) => {
-      const prev = entries[index - 1]
+
+    {top3.length === 3 && (
+      <div className="podium">
+        {[1, 0, 2].map(idx => {
+          const e = top3[idx]
+          const isFirst = idx === 0
+          const color = podiumColors[idx]
+          return (
+            <div key={idx} className="podium-slot">
+              <div
+                className="podium-avatar"
+                style={{ '--podium-color': color, width: isFirst ? 52 : 44, height: isFirst ? 52 : 44, fontSize: isFirst ? 20 : 17 }}
+              >
+                {idx + 1}
+              </div>
+              <div className="podium-name">{e.profile?.display_name ?? 'Player'}</div>
+              <div className="podium-pts" style={{ color: 'var(--green)' }}>{e.total_points}</div>
+              <div className="podium-pts-label">pts</div>
+            </div>
+          )
+        })}
+      </div>
+    )}
+
+    {(top3.length < 3 ? entries : rest).map((entry, index) => {
+      const adjustedIndex = top3.length === 3 ? index + 3 : index
+      const prev = entries[adjustedIndex - 1]
       const tied = prev && prev.total_points === entry.total_points
       let tiebreakerLabel = null
       if (tied) {
@@ -120,10 +149,15 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch }) {
         }
       }
 
+      const accentClass = top3.length < 3 && adjustedIndex === 0 ? ' top-1'
+        : top3.length < 3 && adjustedIndex === 1 ? ' top-2'
+        : top3.length < 3 && adjustedIndex === 2 ? ' top-3'
+        : ''
+
       return (
-      <div key={entry.user_id} className={`leaderboard-entry${index === 0 ? ' top-1' : index === 1 ? ' top-2' : index === 2 ? ' top-3' : ''}`}>
-        <div className={`rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}`}>
-          {index + 1}
+      <div key={entry.user_id} className={`leaderboard-entry${accentClass}`}>
+        <div className="rank">
+          {adjustedIndex + 1}
         </div>
         <div className="entry-info">
           <div className="entry-name">

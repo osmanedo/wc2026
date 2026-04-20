@@ -3,7 +3,7 @@ import ScorePicker from './ScorePicker'
 import AIBrief from './AIBrief'
 import './MatchCard.css'
 
-export default function MatchCard({ match, user, existingPick, onPickSubmitted }) {
+export default function MatchCard({ match, user, existingPick, onPickSubmitted, onSignIn }) {
   const [showPicker, setShowPicker] = useState(false)
   const [showBrief, setShowBrief] = useState(false)
   const [now, setNow] = useState(Date.now())
@@ -63,7 +63,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
   }
 
   return (
-    <div className="match-card">
+    <div className={`match-card${isFinished ? ' finished' : ''}`}>
       <div className="match-teams">
         <img className="team-flag" src={match.home_team.flag_url} alt={`${match.home_team.name} flag`} />
         <span className="team-name">{match.home_team.name}</span>
@@ -84,62 +84,58 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted }
         <img className="team-flag" src={match.away_team.flag_url} alt={`${match.away_team.name} flag`} />
       </div>
 
-      {existingPick && isFinished ? (
-        <div className="pick-display">
-          ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
-          {pointsEarned != null && (
-            <span className="points-badge">{pointsEarned} pts</span>
-          )}
+      <div className="pick-action-row">
+        <div className="pick-action-left">
+          {existingPick && isFinished ? (
+            <div className="pick-display">
+              ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+              {pointsEarned != null && (
+                <span className="points-badge">{pointsEarned} pts</span>
+              )}
+            </div>
+          ) : existingPick && canPick ? (
+            <div className="pick-display" style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>
+              ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+              <span className="edit-hint">Tap to edit</span>
+            </div>
+          ) : existingPick ? (
+            <div className="pick-display">
+              ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+            </div>
+          ) : !canPick && !isFinished ? (
+            <div className="locked-badge">🔒 Locked</div>
+          ) : canPick && user && isUnder24h ? (
+            <div className={`pick-prompt countdown${isUrgent ? ' urgent' : ''}`} style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>
+              ⏱ {getCountdown()}
+            </div>
+          ) : canPick && user ? (
+            <div className="pick-prompt tap-to-tip" style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>Tap to tip</div>
+          ) : canPick && !user ? (
+            <button className="pick-prompt sign-in" onClick={onSignIn}>Sign in to start tipping</button>
+          ) : null}
         </div>
-      ) : existingPick && canPick ? (
-        <div className="pick-display" style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>
-          ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
-          <span className="edit-hint">Tap to edit</span>
-        </div>
-      ) : existingPick ? (
-        <div className="pick-display">
-          ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
-        </div>
-      ) : !canPick && !isFinished ? (
-        <div className="locked-badge">🔒 Locked</div>
-      ) : canPick && user && isUnder24h ? (
-        <div className={`pick-prompt countdown${isUrgent ? ' urgent' : ''}`} style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>
-          ⏱ {getCountdown()}
-        </div>
-      ) : canPick && user ? (
-        <div className="pick-prompt tap-to-tip" style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>Tap to tip</div>
-      ) : canPick && !user ? (
-        <div className="pick-prompt sign-in">Sign in to start tipping</div>
-      ) : null}
 
-      {/* AI Brief trigger button — always visible */}
-      <div className="ai-brief-row">
-          <button
-            className="ai-brief-btn"
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowBrief(true)
-            }}
-          >
-            AI Brief & Prediction
-          </button>
-        </div>
+        <button
+          className="ai-brief-btn"
+          onClick={(e) => {
+            e.stopPropagation()
+            setShowBrief(true)
+          }}
+        >
+          AI Brief & Prediction
+        </button>
+      </div>
 
       {showPicker && (
-        <div onClick={(e) => e.stopPropagation()}>
-          <ScorePicker
-            match={match}
-            user={user}
-            onPickSubmitted={() => {
-              setShowPicker(false)
-              onPickSubmitted()
-            }}
-          />
-          <button className="cancel-btn" onClick={(e) => {
-            e.stopPropagation()
+        <ScorePicker
+          match={match}
+          user={user}
+          onPickSubmitted={() => {
             setShowPicker(false)
-          }}>Cancel</button>
-        </div>
+            onPickSubmitted()
+          }}
+          onClose={() => setShowPicker(false)}
+        />
       )}
 
       {/* AI Brief modal */}
