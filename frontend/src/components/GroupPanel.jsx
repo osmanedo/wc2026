@@ -9,10 +9,26 @@ export default function GroupPanel({ user, onClose }) {
   const [message, setMessage] = useState('')
 
   const handleCreate = async () => {
+    if (!groupName.trim()) {
+      setMessage("Group name cannot be blank")
+      return
+    }
+
+    const { data: existing } = await supabase
+      .from("groups")
+      .select("id")
+      .ilike("name", groupName.trim())
+      .limit(1)
+
+    if (existing?.length > 0) {
+      setMessage("A group with that name already exists")
+      return
+    }
+
     const code = Math.random().toString(36).substring(2, 8).toUpperCase()
     const { data: group, error: groupError } = await supabase
       .from("groups")
-      .insert({ name: groupName, code: code, created_by: user.id })
+      .insert({ name: groupName.trim(), code: code, created_by: user.id })
       .select()
       .single()
 
