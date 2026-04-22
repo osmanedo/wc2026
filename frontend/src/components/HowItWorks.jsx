@@ -5,7 +5,7 @@ export default function HowItWorks({ onClose }) {
     <div className="ai-brief-overlay" onClick={onClose}>
       <div className="ai-brief-modal hiw-modal" onClick={(e) => e.stopPropagation()}>
         <div className="ai-brief-header">
-          <span className="ai-brief-title">Welcome to WC2026 Fantasy! 🏆</span>
+          <span className="ai-brief-title">Welcome to WC2026 Fantasy!! 🏆</span>
           <button className="ai-brief-close" onClick={onClose}>✕</button>
         </div>
 
