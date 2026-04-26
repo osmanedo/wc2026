@@ -173,3 +173,29 @@
   color: var(--gray-600);
   margin-top: 8px;
 }
+
+.share-card {
+  background: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.share-link {
+  font-size: 13px;
+  color: var(--text-dim, #94a3b8);
+  word-break: break-all;
+  margin-bottom: 12px;
+  font-family: monospace;
+}
+
+.share-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.share-buttons .panel-submit-btn,
+.share-buttons .panel-close-btn {
+  flex: 1;
+}

@@ -33,6 +33,7 @@ export default function App() {
   const [filterTeam, setFilterTeam] = useState('all')
   const [filterRound, setFilterRound] = useState('all')
   const [filterGroup, setFilterGroup] = useState('all')
+  const [isDeepLinkJoin, setIsDeepLinkJoin] = useState(false)
 
   const copyCode = (code) => {
     navigator.clipboard.writeText(code).then(() => {
@@ -115,6 +116,16 @@ export default function App() {
   }
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const joinCode = params.get('join')
+    if (joinCode) {
+      sessionStorage.setItem('pendingJoinCode', joinCode)
+      // Clean the URL so it doesn't look messy or re-trigger on refresh
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
+
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
@@ -177,6 +188,16 @@ export default function App() {
       .then(({ data }) => setDisplayName(data?.display_name ?? null))
     fetchPicks()
   }, [user])
+
+  useEffect(() => {
+  if (!user) return
+  const pending = sessionStorage.getItem('pendingJoinCode')
+  if (pending) {
+    setView('groups')
+    setShowGroupPanel(true)
+    // Don't clear it here — GroupPanel will clear it after successful join
+  }
+}, [user])
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -323,35 +344,47 @@ export default function App() {
 
         {view === 'groups' && (
           <div className="groups-view">
-            <h2 className="groups-title">My Groups</h2>
-            <p className="groups-subtitle">Create or join a group to compete with friends</p>
-            <button className="create-join-btn" onClick={() => {
-              if (!user) { setShowGroupSignIn(true); return }
-              setShowGroupSignIn(false)
-              setShowGroupPanel(true)
-            }}>
-              + Create or Join a Group
-            </button>
-            {showGroupSignIn && !user && (
-              <div className="empty-state sign-in-prompt">
-                <div className="empty-state-icon">👥</div>
-                <div className="empty-state-title">Sign in to continue</div>
-                <div className="empty-state-body">You need to be signed in to create or join a group.</div>
+            {!isDeepLinkJoin && (
+              <>
+                <h2 className="groups-title">My Groups</h2>
+                <p className="groups-subtitle">Create or join a group to compete with friends</p>
+                <button className="create-join-btn" onClick={() => {
+                  if (!user) { setShowGroupSignIn(true); return }
+                  setShowGroupSignIn(false)
+                  setShowGroupPanel(true)
+              }}>
+                + Create or Join a Group
+              </button>
+              {showGroupSignIn && !user && (
+                <div className="empty-state sign-in-prompt">
+                  <div className="empty-state-icon">👥</div>
+                  <div className="empty-state-title">Sign in to continue</div>
+                  <div className="empty-state-body">You need to be signed in to create or join a group.</div>
                 <Auth />
               </div>
             )}
-            {showGroupPanel && (
-              <GroupPanel user={user} onClose={() => {
-                setShowGroupPanel(false)
-                if (user) {
-                  supabase
-                    .from("group_members")
-                    .select(`*, group:groups(id, name, code)`)
-                    .eq("user_id", user.id)
-                    .then(({ data }) => setUserGroups(data?.map(m => m.group) || []))
-                }
-              }} />
-            )}
+          </>
+        )}
+        {showGroupPanel && (
+          <GroupPanel
+            user={user}
+            initialJoinCode={sessionStorage.getItem('pendingJoinCode')}
+            onClose={() => {
+              sessionStorage.removeItem('pendingJoinCode')
+              setShowGroupPanel(false)
+              setIsDeepLinkJoin(false)
+              if (user) {
+                supabase
+                  .from("group_members")
+                  .select(`*, group:groups(id, name, code)`)
+                  .eq("user_id", user.id)
+                  .then(({ data }) => setUserGroups(data?.map(m => m.group) || []))
+              }
+            }}
+          />
+        )}
+        {!isDeepLinkJoin && (
+          <>
             {groupsError && <div className="error-banner">{groupsError}</div>}
             <div className="my-groups-list">
               {userGroups.length === 0 ? (
@@ -368,17 +401,19 @@ export default function App() {
                       <div className="group-card-code">{group.member_count != null ? `${group.member_count} members` : 'Tap code to copy'}</div>
                     </div>
                     <button className={`code-badge${copiedCode === group.code ? ' copied' : ''}`} onClick={() => copyCode(group.code)}>
-                      {copiedCode === group.code ? 'Copied!' : group.code}
+                     {copiedCode === group.code ? 'Copied!' : group.code}
                     </button>
                   </div>
-                ))
-              )}
-            </div>
-            <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
-              How it works
-            </button>
+              ))
+            )}
           </div>
-        )}
+          <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
+            How it works
+          </button>
+        </>
+      )}
+    </div>
+  )}
       </main>
 
       {showAuthModal && (
