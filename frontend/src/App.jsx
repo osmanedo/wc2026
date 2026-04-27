@@ -45,7 +45,10 @@ export default function App() {
   const [showGroupPanel, setShowGroupPanel] = useState(false)
   const [showGroupSignIn, setShowGroupSignIn] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(
-    () => !localStorage.getItem('wc2026_welcomed')
+  () => !localStorage.getItem('wc2026_welcomed') && !sessionStorage.getItem('pendingJoinCode')
+  )
+  const [showInviteBanner, setShowInviteBanner] = useState(
+  () => !!sessionStorage.getItem('pendingJoinCode')
   )
   const [installPrompt, setInstallPrompt] = useState(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
@@ -195,6 +198,8 @@ export default function App() {
   if (pending) {
     setView('groups')
     setShowGroupPanel(true)
+    setIsDeepLinkJoin(true)
+    setShowInviteBanner(false)
     // Don't clear it here — GroupPanel will clear it after successful join
   }
 }, [user])
@@ -218,6 +223,19 @@ export default function App() {
           <button className="install-banner-dismiss" onClick={dismissInstallBanner}>✕</button>
         </div>
       )}
+
+      {showInviteBanner && !user && (
+        <div className="invite-banner">
+          <div className="invite-banner-content">
+            <span className="invite-banner-icon">⚽</span>
+            <div>
+              <div className="invite-banner-title">You've been invited to a tipping group!</div>
+              <div className="invite-banner-body">Sign in to join your mates and start making predictions.</div>
+            </div>
+        </div>
+        <button className="signin-btn" onClick={() => setShowAuthModal(true)}>Sign In to Join</button>
+      </div>
+    )}
 
       {/* Header */}
       <header className="header">

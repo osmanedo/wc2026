@@ -433,3 +433,37 @@
     padding-right: 20%;
   }
 }
+
+.invite-banner {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.12), rgba(22, 163, 74, 0.04));
+  border-bottom: 1px solid rgba(22, 163, 74, 0.25);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.invite-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invite-banner-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.invite-banner-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text, #e2e8f0);
+}
+
+.invite-banner-body {
+  font-size: 13px;
+  color: var(--text-dim, #94a3b8);
+  margin-top: 2px;
+}

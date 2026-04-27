@@ -75,7 +75,7 @@ export default function GroupPanel({ user, onClose, initialJoinCode }) {
 
   // NEW — share helpers
   const shareLink = createdCode ? `${APP_URL}/?join=${createdCode}` : ''
-  const shareText = `Join my WC2026 tipping group! ⚽🏆\n${shareLink}`
+  const shareText = `Join my WC2026 Fantasy group! ⚽🏆\n${shareLink}`
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -108,7 +108,7 @@ export default function GroupPanel({ user, onClose, initialJoinCode }) {
           <div className="share-link">{shareLink}</div>
           <div className="share-buttons">
             <button className="panel-submit-btn" onClick={handleShare}>
-              {navigator.share ? '📤 Share' : '📋 Copy Invite'}
+              {navigator.share ? '🔗 Share' : '📋 Copy Invite'}
             </button>
             {navigator.share && (
               <button className="panel-close-btn" onClick={handleCopy} style={{ marginTop: 0 }}>
