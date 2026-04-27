@@ -232,7 +232,7 @@ export default function App() {
           <div className="invite-banner-content">
             <span className="invite-banner-icon">⚽</span>
             <div>
-              <div className="invite-banner-title">You've been invited to a tipping group!</div>
+              <div className="invite-banner-title">You've been invited to a Fantasy group!</div>
               <div className="invite-banner-body">Sign in to join your mates and start making predictions.</div>
             </div>
         </div>
