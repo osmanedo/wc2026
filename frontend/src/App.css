@@ -459,7 +459,7 @@
 .invite-banner-title {
   font-weight: 600;
   font-size: 15px;
-  color: var(--text, #e2e8f0);
+  color: var(--text, #1a472a);
 }
 
 .invite-banner-body {
