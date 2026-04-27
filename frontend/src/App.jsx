@@ -45,10 +45,13 @@ export default function App() {
   const [showGroupPanel, setShowGroupPanel] = useState(false)
   const [showGroupSignIn, setShowGroupSignIn] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(
-  () => !localStorage.getItem('wc2026_welcomed') && !sessionStorage.getItem('pendingJoinCode')
+  () => !localStorage.getItem('wc2026_welcomed')
+  && !sessionStorage.getItem('pendingJoinCode')
+  && !new URLSearchParams(window.location.search).get('join')
   )
   const [showInviteBanner, setShowInviteBanner] = useState(
   () => !!sessionStorage.getItem('pendingJoinCode')
+    || !!new URLSearchParams(window.location.search).get('join')
   )
   const [installPrompt, setInstallPrompt] = useState(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
