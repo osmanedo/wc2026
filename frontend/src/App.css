@@ -208,19 +208,47 @@
   flex: 1;
   background: none;
   border: none;
-  font-size: 11px;
   color: var(--gray-400);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 6px 0;
+  gap: 3px;
+  padding: 4px 0;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
   transition: color 0.2s;
+}
+
+.bottom-nav .nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 28px;
+  border-radius: 14px;
+  transition: background 0.2s ease;
+}
+
+.bottom-nav .nav-label {
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  transition: font-weight 0.2s;
 }
 
 .bottom-nav button.active {
   color: var(--green);
-  font-weight: 500;
+}
+
+.bottom-nav button.active .nav-icon {
+  background: rgba(26, 71, 42, 0.1);
+}
+
+.bottom-nav button.active .nav-label {
+  font-weight: 600;
+}
+
+.bottom-nav button:not(.active):hover .nav-icon {
+  background: var(--gray-100);
 }
 
 /* Footer */
@@ -452,8 +480,10 @@
 }
 
 .invite-banner-icon {
-  font-size: 28px;
   flex-shrink: 0;
+  color: var(--green);
+  display: flex;
+  align-items: center;
 }
 
 .invite-banner-title {

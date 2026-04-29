@@ -2,6 +2,27 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import './LeaguePanel.css'
 
+const CheckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+)
+
+const CopyIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2"/>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+  </svg>
+)
+
+const ShareIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+    <polyline points="16 6 12 2 8 6"/>
+    <line x1="12" y1="2" x2="12" y2="15"/>
+  </svg>
+)
+
 const APP_URL = 'https://wc2026fantasy.app'
 
 export default function LeaguePanel({ user, onClose, initialJoinCode }) {
@@ -72,22 +93,18 @@ export default function LeaguePanel({ user, onClose, initialJoinCode }) {
   }
 
   const shareLink = createdCode ? `${APP_URL}/?join=${createdCode}` : ''
-  const shareText = `Join my WC2026 Fantasy League! ⚽🏆\n${shareLink}`
+  const shareText = `Join my WC2026 Fantasy League!\n${shareLink}`
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ text: shareText })
-      } catch (err) {
-        // User cancelled the share sheet — that's fine
-      }
-    } else {
-      handleCopy()
+    try {
+      await navigator.share({ text: shareText })
+    } catch (err) {
+      // User cancelled the share sheet — that's fine
     }
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(shareText).then(() => {
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareLink).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
@@ -97,22 +114,23 @@ export default function LeaguePanel({ user, onClose, initialJoinCode }) {
   if (createdCode) {
     return (
       <div className="league-panel">
-        <h3 className="panel-title">League Created! 🎉</h3>
-        <p className="panel-message" style={{ marginBottom: 12 }}>
-          Share this link with your mates — they'll be added automatically:
+        <div className="success-badge"><CheckIcon /> League Created</div>
+        <h3 className="panel-title">Invite your mates</h3>
+        <p className="panel-message">
+          Share this link — they'll be added automatically:
         </p>
         <div className="share-card">
-          <div className="share-link">{shareLink}</div>
-          <div className="share-buttons">
-            <button className="panel-submit-btn" onClick={handleShare}>
-              {navigator.share ? '🔗 Share' : '📋 Copy Invite'}
+          <div className="share-input-row">
+            <input className="share-input-field" readOnly value={shareLink} />
+            <button className="copy-icon-btn" onClick={handleCopyLink} title={copied ? 'Copied!' : 'Copy link'}>
+              {copied ? <CheckIcon /> : <CopyIcon />}
             </button>
-            {navigator.share && (
-              <button className="panel-close-btn" onClick={handleCopy} style={{ marginTop: 0 }}>
-                {copied ? '✓ Copied!' : '📋 Copy'}
-              </button>
-            )}
           </div>
+          {navigator.share && (
+            <button className="panel-submit-btn share-native-btn" onClick={handleShare}>
+              <ShareIcon /> Share with mates
+            </button>
+          )}
         </div>
         <button className="panel-close-btn" onClick={onClose}>Done</button>
       </div>

@@ -182,20 +182,63 @@
   margin-bottom: 16px;
 }
 
-.share-link {
-  font-size: 13px;
-  color: var(--text-dim, #94a3b8);
-  word-break: break-all;
-  margin-bottom: 12px;
-  font-family: monospace;
+.success-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(26, 71, 42, 0.08);
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
 }
 
-.share-buttons {
+.share-input-row {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid rgba(22, 163, 74, 0.3);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 10px;
 }
 
-.share-buttons .panel-submit-btn,
-.share-buttons .panel-close-btn {
+.share-input-field {
   flex: 1;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--gray-600);
+  background: none;
+  border: none;
+  outline: none;
+  min-width: 0;
+}
+
+.copy-icon-btn {
+  flex-shrink: 0;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  border-left: 1px solid rgba(22, 163, 74, 0.2);
+  color: var(--green);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.copy-icon-btn:hover {
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.share-native-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
