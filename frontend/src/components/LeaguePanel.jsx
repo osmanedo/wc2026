@@ -161,7 +161,7 @@ export default function LeaguePanel({ user, onClose, initialJoinCode }) {
           <input
             className="panel-input"
             type="text"
-            placeholder="League name (e.g. Dad's Crew)"
+            placeholder="League name (e.g. Yum Yum FC)"
             value={leagueName}
             onChange={(e) => setLeagueName(e.target.value)}
           />
