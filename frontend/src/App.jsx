@@ -379,6 +379,7 @@ export default function App() {
             <Leaderboard
               selectedGroup={selectedLeague}
               hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
+              onShowHowItWorks={() => setShowHowItWorks(true)}
             />
             {!user && (
               <div className="leaderboard-signin-cta">
@@ -386,9 +387,6 @@ export default function App() {
                 <Auth />
               </div>
             )}
-            <button className="how-it-works-link" onClick={() => setShowHowItWorks(true)}>
-              How it works
-            </button>
           </div>
         )}
 

@@ -34,6 +34,16 @@ export default function HowItWorks({ onClose }) {
             </div>
           </div>
 
+          <div className="hiw-section-label">Tiebreakers (in order)</div>
+          <ol className="hiw-tiebreak-list">
+            <li>Most exact-score predictions</li>
+            <li>Most correct results (W / D / L)</li>
+            <li>Highest single-match haul</li>
+            <li>Longest current correct streak</li>
+            <li>Best accuracy %</li>
+            <li>Alphabetical, as a final fallback</li>
+          </ol>
+
           <div className="hiw-section-label">Tips</div>
           <ul className="hiw-tips">
             <li>Tap any match to submit your tip before kickoff.</li>

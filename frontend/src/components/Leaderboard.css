@@ -21,6 +21,7 @@
 }
 
 .podium-avatar {
+  --podium-color: var(--gray-400);
   border-radius: 50%;
   background: color-mix(in srgb, var(--podium-color) 15%, transparent);
   border: 2px solid var(--podium-color);
@@ -29,7 +30,20 @@
   justify-content: center;
   font-family: 'Syne', sans-serif;
   font-weight: 800;
+  font-size: 17px;
+  width: 44px;
+  height: 44px;
   color: var(--podium-color);
+}
+
+.podium-avatar[data-rank="1"] { --podium-color: var(--gold); }
+.podium-avatar[data-rank="2"] { --podium-color: var(--silver); }
+.podium-avatar[data-rank="3"] { --podium-color: var(--bronze); }
+
+.podium-avatar--first {
+  width: 52px;
+  height: 52px;
+  font-size: 20px;
 }
 
 .podium-name {
@@ -47,11 +61,38 @@
   font-family: 'Syne', sans-serif;
   font-size: 20px;
   font-weight: 800;
+  color: var(--green);
 }
 
 .podium-pts-label {
   font-size: 10px;
   color: var(--gray-400);
+}
+
+.podium-form {
+  margin-top: 4px;
+  gap: 2px;
+}
+
+.podium-form .form-dot {
+  width: 5px;
+  height: 5px;
+}
+
+.podium-badge {
+  margin-top: 4px;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.podium-tiebreaker {
+  margin-top: 3px;
+  font-size: 10px;
 }
 
 .leaderboard .empty-state-icon {
@@ -91,10 +132,25 @@
   margin-bottom: 4px;
 }
 
-.leaderboard-subtitle {
-  font-size: 12px;
+.leaderboard-tiebreak-note {
+  font-size: 11px;
   color: var(--gray-400);
   margin-bottom: 16px;
+}
+
+.tiebreak-note-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tiebreak-note-link:hover {
+  color: var(--gray-600);
 }
 
 .leaderboard-entry {
@@ -113,11 +169,6 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-.leaderboard-entry.top-1 { border-left: 2px solid #f59e0b; }
-.leaderboard-entry.top-2 { border-left: 2px solid #94a3b8; }
-.leaderboard-entry.top-3 { border-left: 2px solid #b45309; }
-
-
 .rank {
   font-family: 'Syne', sans-serif;
   font-size: 13px;
@@ -132,10 +183,6 @@
   align-items: center;
   justify-content: center;
 }
-
-.rank.gold   { color: #f59e0b; background: rgba(245,158,11,0.1); }
-.rank.silver { color: #94a3b8; background: rgba(148,163,184,0.15); }
-.rank.bronze { color: #b45309; background: rgba(180,83,9,0.1); }
 
 .entry-info {
   flex: 1;

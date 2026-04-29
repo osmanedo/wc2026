@@ -85,6 +85,22 @@
   font-size: 12px;
 }
 
+/* Tiebreak list */
+.hiw-tiebreak-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 22px;
+  margin: 0;
+}
+
+.hiw-tiebreak-list li {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #444;
+}
+
 /* CTA button */
 .hiw-cta {
   width: 100%;
