@@ -14,7 +14,7 @@ import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import MatchCard from './components/MatchCard'
 import Leaderboard from './components/Leaderboard'
-import GroupPanel from './components/GroupPanel'
+import LeaguePanel from './components/LeaguePanel'
 import HowItWorks from './components/HowItWorks'
 
 export default function App() {
@@ -24,9 +24,9 @@ export default function App() {
   const [matchesError, setMatchesError] = useState(null)
   const [user, setUser] = useState(null)
   const [picks, setPicks] = useState([])
-  const [selectedGroup, setSelectedGroup] = useState(null)
-  const [userGroups, setUserGroups] = useState([])
-  const [groupsError, setGroupsError] = useState(null)
+  const [selectedLeague, setSelectedLeague] = useState(null)
+  const [userLeagues, setUserLeagues] = useState([])
+  const [leaguesError, setLeaguesError] = useState(null)
   const [displayName, setDisplayName] = useState(null)
   const [copiedCode, setCopiedCode] = useState(null)
   const [filterDate, setFilterDate] = useState('all')
@@ -42,8 +42,8 @@ export default function App() {
     })
   }
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const [showGroupPanel, setShowGroupPanel] = useState(false)
-  const [showGroupSignIn, setShowGroupSignIn] = useState(false)
+  const [showLeaguePanel, setShowLeaguePanel] = useState(false)
+  const [showLeagueSignIn, setShowLeagueSignIn] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(
   () => !localStorage.getItem('wc2026_welcomed')
   && !sessionStorage.getItem('pendingJoinCode')
@@ -172,19 +172,19 @@ export default function App() {
       .select(`*, group:groups(id, name, code)`)
       .eq("user_id", user.id)
       .then(async ({ data, error }) => {
-        if (error) { setGroupsError('Could not load your groups.'); return }
-        const groups = data?.map(m => m.group) || []
-        if (groups.length === 0) { setUserGroups([]); return }
-        const groupIds = groups.map(g => g.id)
+        if (error) { setLeaguesError('Could not load your leagues.'); return }
+        const leagues = data?.map(m => m.group) || []
+        if (leagues.length === 0) { setUserLeagues([]); return }
+        const leagueIds = leagues.map(g => g.id)
         const { data: countRows } = await supabase
           .from("group_members")
           .select("group_id")
-          .in("group_id", groupIds)
+          .in("group_id", leagueIds)
         const countMap = (countRows || []).reduce((acc, r) => {
           acc[r.group_id] = (acc[r.group_id] || 0) + 1
           return acc
         }, {})
-        setUserGroups(groups.map(g => ({ ...g, member_count: countMap[g.id] || 0 })))
+        setUserLeagues(leagues.map(g => ({ ...g, member_count: countMap[g.id] || 0 })))
       })
     supabase
       .from("profiles")
@@ -199,8 +199,8 @@ export default function App() {
   if (!user) return
   const pending = sessionStorage.getItem('pendingJoinCode')
   if (pending) {
-    setView('groups')
-    setShowGroupPanel(true)
+    setView('leagues')
+    setShowLeaguePanel(true)
     setIsDeepLinkJoin(true)
     setShowInviteBanner(false)
     // Don't clear it here — GroupPanel will clear it after successful join
@@ -232,7 +232,7 @@ export default function App() {
           <div className="invite-banner-content">
             <span className="invite-banner-icon">⚽</span>
             <div>
-              <div className="invite-banner-title">You've been invited to a Fantasy group!</div>
+              <div className="invite-banner-title">You've been invited to a Fantasy League!</div>
               <div className="invite-banner-body">Sign in to join your mates and start making predictions.</div>
             </div>
         </div>
@@ -330,25 +330,25 @@ export default function App() {
 
         {view === 'leaderboard' && (
           <div>
-            {user && userGroups.length > 0 && (
-              <div className="group-tabs">
+            {user && userLeagues.length > 0 && (
+              <div className="league-tabs">
                 <button
-                className={`group-tab ${!selectedGroup ? 'active' : ''}`}
-                  onClick={() => setSelectedGroup(null)}>
+                className={`league-tab ${!selectedLeague ? 'active' : ''}`}
+                  onClick={() => setSelectedLeague(null)}>
                   All Players
                 </button>
-                {userGroups.map(group => (
+                {userLeagues.map(league => (
                   <button
-                  key={group.id}
-                  className={`group-tab ${selectedGroup?.id === group.id ? 'active' : ''}`}
-                  onClick={() => setSelectedGroup(group)}>
-                  {group.name}
+                  key={league.id}
+                  className={`league-tab ${selectedLeague?.id === league.id ? 'active' : ''}`}
+                  onClick={() => setSelectedLeague(league)}>
+                  {league.name}
                 </button>
               ))}
               </div>
             )}
             <Leaderboard
-              selectedGroup={selectedGroup}
+              selectedGroup={selectedLeague}
               hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
             />
             {!user && (
@@ -363,66 +363,66 @@ export default function App() {
           </div>
         )}
 
-        {view === 'groups' && (
-          <div className="groups-view">
+        {view === 'leagues' && (
+          <div className="leagues-view">
             {!isDeepLinkJoin && (
               <>
-                <h2 className="groups-title">My Groups</h2>
-                <p className="groups-subtitle">Create or join a group to compete with friends</p>
+                <h2 className="leagues-title">My Leagues</h2>
+                <p className="leagues-subtitle">Create or join a league to compete with friends</p>
                 <button className="create-join-btn" onClick={() => {
-                  if (!user) { setShowGroupSignIn(true); return }
-                  setShowGroupSignIn(false)
-                  setShowGroupPanel(true)
+                  if (!user) { setShowLeagueSignIn(true); return }
+                  setShowLeagueSignIn(false)
+                  setShowLeaguePanel(true)
               }}>
-                + Create or Join a Group
+                + Create or Join a League
               </button>
-              {showGroupSignIn && !user && (
+              {showLeagueSignIn && !user && (
                 <div className="empty-state sign-in-prompt">
                   <div className="empty-state-icon">👥</div>
                   <div className="empty-state-title">Sign in to continue</div>
-                  <div className="empty-state-body">You need to be signed in to create or join a group.</div>
+                  <div className="empty-state-body">You need to be signed in to create or join a league.</div>
                 <Auth />
               </div>
             )}
           </>
         )}
-        {showGroupPanel && (
-          <GroupPanel
+        {showLeaguePanel && (
+          <LeaguePanel
             user={user}
             initialJoinCode={sessionStorage.getItem('pendingJoinCode')}
             onClose={() => {
               sessionStorage.removeItem('pendingJoinCode')
-              setShowGroupPanel(false)
+              setShowLeaguePanel(false)
               setIsDeepLinkJoin(false)
               if (user) {
                 supabase
                   .from("group_members")
                   .select(`*, group:groups(id, name, code)`)
                   .eq("user_id", user.id)
-                  .then(({ data }) => setUserGroups(data?.map(m => m.group) || []))
+                  .then(({ data }) => setUserLeagues(data?.map(m => m.group) || []))
               }
             }}
           />
         )}
         {!isDeepLinkJoin && (
           <>
-            {groupsError && <div className="error-banner">{groupsError}</div>}
-            <div className="my-groups-list">
-              {userGroups.length === 0 ? (
+            {leaguesError && <div className="error-banner">{leaguesError}</div>}
+            <div className="my-leagues-list">
+              {userLeagues.length === 0 ? (
                 <div className="empty-state">
                   <div className="empty-state-icon">👥</div>
-                  <div className="empty-state-title">You are not in a group yet</div>
+                  <div className="empty-state-title">You are not in a league yet</div>
                   <div className="empty-state-body">Create or join one above to compete with friends.</div>
                 </div>
               ) : (
-                userGroups.map(group => (
-                  <div key={group.id} className="group-card">
+                userLeagues.map(league => (
+                  <div key={league.id} className="league-card">
                     <div>
-                      <div className="group-card-name">{group.name}</div>
-                      <div className="group-card-code">{group.member_count != null ? `${group.member_count} members` : 'Tap code to copy'}</div>
+                      <div className="league-card-name">{league.name}</div>
+                      <div className="league-card-code">{league.member_count != null ? `${league.member_count} members` : 'Tap code to copy'}</div>
                     </div>
-                    <button className={`code-badge${copiedCode === group.code ? ' copied' : ''}`} onClick={() => copyCode(group.code)}>
-                     {copiedCode === group.code ? 'Copied!' : group.code}
+                    <button className={`code-badge${copiedCode === league.code ? ' copied' : ''}`} onClick={() => copyCode(league.code)}>
+                     {copiedCode === league.code ? 'Copied!' : league.code}
                     </button>
                   </div>
               ))
@@ -465,8 +465,8 @@ export default function App() {
         <button onClick={() => setView('leaderboard')} className={view === 'leaderboard' ? 'active' : ''}>
           🏆 Leaderboard
         </button>
-        <button onClick={() => setView('groups')} className={view === 'groups' ? 'active' : ''}>
-          👥 Groups
+        <button onClick={() => setView('leagues')} className={view === 'leagues' ? 'active' : ''}>
+          👥 Leagues
         </button>
       </nav>
     </div>

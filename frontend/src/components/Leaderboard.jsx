@@ -27,7 +27,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch }) {
           .eq("group_id", selectedGroup.id)
 
         if (membersError) {
-          setError('Could not load group members.')
+          setError('Could not load league members.')
           setLoading(false)
           return
         }

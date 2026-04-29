@@ -38,7 +38,7 @@ export default function HowItWorks({ onClose }) {
           <ul className="hiw-tips">
             <li>Tap any match to submit your tip before kickoff.</li>
             <li>Check <strong>AI Brief</strong> for match insights and predictions.</li>
-            <li>Join a group to compete on a private leaderboard with friends.</li>
+            <li>Join a league to compete on a private leaderboard with friends.</li>
           </ul>
 
           <button className="hiw-cta" onClick={onClose}>Let's go!</button>

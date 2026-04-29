@@ -228,7 +228,7 @@
   border-color: rgba(34, 197, 94, 0.2);
 }
 
-.group-tabs {
+.league-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
@@ -236,7 +236,7 @@
   padding-bottom: 4px;
 }
 
-.group-tab {
+.league-tab {
   padding: 6px 14px;
   border-radius: 20px;
   border: 1px solid var(--gray-200);
@@ -247,7 +247,7 @@
   white-space: nowrap;
 }
 
-.group-tab.active {
+.league-tab.active {
   background: var(--green);
   color: var(--white);
   border-color: var(--green);

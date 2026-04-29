@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import './GroupPanel.css'
+import './LeaguePanel.css'
 
 const APP_URL = 'https://wc2026fantasy.app'
 
-export default function GroupPanel({ user, onClose, initialJoinCode }) {
+export default function LeaguePanel({ user, onClose, initialJoinCode }) {
   // If there's a pending join code, default to join mode with it pre-filled
   const [mode, setMode] = useState(initialJoinCode ? 'join' : 'join')
-  const [groupName, setGroupName] = useState('')
+  const [leagueName, setLeagueName] = useState('')
   const [joinCode, setJoinCode] = useState(initialJoinCode ?? '')
   const [message, setMessage] = useState('')
-  const [createdCode, setCreatedCode] = useState(null)   // NEW — tracks the share card state
-  const [copied, setCopied] = useState(false)             // NEW — for copy feedback
+  const [createdCode, setCreatedCode] = useState(null)
+  const [copied, setCopied] = useState(false)
 
-  // NEW — if a deep link code was passed in, prompt the user immediately
+  // If a deep link code was passed in, prompt the user immediately
   useEffect(() => {
     if (initialJoinCode) {
       setJoinCode(initialJoinCode)
@@ -22,60 +22,57 @@ export default function GroupPanel({ user, onClose, initialJoinCode }) {
   }, [initialJoinCode])
 
   const handleCreate = async () => {
-    if (!groupName.trim()) {
-      setMessage("Group name cannot be blank")
+    if (!leagueName.trim()) {
+      setMessage("League name cannot be blank")
       return
     }
 
     const { data: existing } = await supabase
       .from("groups")
       .select("id")
-      .ilike("name", groupName.trim())
+      .ilike("name", leagueName.trim())
       .limit(1)
 
     if (existing?.length > 0) {
-      setMessage("A group with that name already exists")
+      setMessage("A league with that name already exists")
       return
     }
 
     const code = Math.random().toString(36).substring(2, 8).toUpperCase()
-    const { data: group, error: groupError } = await supabase
+    const { data: league, error: leagueError } = await supabase
       .from("groups")
-      .insert({ name: groupName.trim(), code: code, created_by: user.id })
+      .insert({ name: leagueName.trim(), code: code, created_by: user.id })
       .select()
       .single()
 
-    if (groupError) { setMessage("Error creating group"); return }
+    if (leagueError) { setMessage("Error creating league"); return }
 
-    await supabase.from("group_members").insert({ group_id: group.id, user_id: user.id })
-    
-    // NEW — instead of a plain message, show the share card
+    await supabase.from("group_members").insert({ group_id: league.id, user_id: user.id })
+
     setCreatedCode(code)
     setMessage('')
   }
 
   const handleJoin = async () => {
-    const { data: group, error } = await supabase
+    const { data: league, error } = await supabase
       .from("groups").select("*")
       .eq("code", joinCode.toUpperCase())
       .single()
 
-    if (error || !group) { setMessage("Group not found — check the code"); return }
+    if (error || !league) { setMessage("League not found — check the code"); return }
 
     const { error: joinError } = await supabase
       .from("group_members")
-      .insert({ group_id: group.id, user_id: user.id })
+      .insert({ group_id: league.id, user_id: user.id })
 
-    if (joinError) { setMessage("You may already be in this group"); return }
+    if (joinError) { setMessage("You may already be in this league"); return }
 
-    // NEW — clear the stashed code after a successful join
     sessionStorage.removeItem('pendingJoinCode')
-    setMessage(`Joined "${group.name}" successfully!`)
+    setMessage(`Joined "${league.name}" successfully!`)
   }
 
-  // NEW — share helpers
   const shareLink = createdCode ? `${APP_URL}/?join=${createdCode}` : ''
-  const shareText = `Join my WC2026 Fantasy group! ⚽🏆\n${shareLink}`
+  const shareText = `Join my WC2026 Fantasy League! ⚽🏆\n${shareLink}`
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -96,11 +93,11 @@ export default function GroupPanel({ user, onClose, initialJoinCode }) {
     })
   }
 
-  // NEW — if a group was just created, show the share card instead of the form
+  // If a league was just created, show the share card instead of the form
   if (createdCode) {
     return (
-      <div className="group-panel">
-        <h3 className="panel-title">Group Created! 🎉</h3>
+      <div className="league-panel">
+        <h3 className="panel-title">League Created! 🎉</h3>
         <p className="panel-message" style={{ marginBottom: 12 }}>
           Share this link with your mates — they'll be added automatically:
         </p>
@@ -123,9 +120,9 @@ export default function GroupPanel({ user, onClose, initialJoinCode }) {
   }
 
   return (
-    <div className="group-panel">
+    <div className="league-panel">
       <h3 className="panel-title">
-        {mode === 'create' ? 'Create a Group' : 'Join a Group'}
+        {mode === 'create' ? 'Create a League' : 'Join a League'}
       </h3>
 
       <div className="mode-toggle">
@@ -146,12 +143,12 @@ export default function GroupPanel({ user, onClose, initialJoinCode }) {
           <input
             className="panel-input"
             type="text"
-            placeholder="Group name (e.g. Dad's Crew)"
-            value={groupName}
-            onChange={(e) => setGroupName(e.target.value)}
+            placeholder="League name (e.g. Dad's Crew)"
+            value={leagueName}
+            onChange={(e) => setLeagueName(e.target.value)}
           />
           <button className="panel-submit-btn" onClick={handleCreate}>
-            Create Group
+            Create League
           </button>
         </>
       )}
@@ -166,7 +163,7 @@ export default function GroupPanel({ user, onClose, initialJoinCode }) {
             onChange={(e) => setJoinCode(e.target.value)}
           />
           <button className="panel-submit-btn" onClick={handleJoin}>
-            Join Group
+            Join League
           </button>
         </>
       )}
