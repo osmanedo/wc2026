@@ -201,9 +201,9 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
                 {topBadge && (
                   <span className={`badge podium-badge ${topBadge.kind}`}>{topBadge.label}</span>
                 )}
-                {tiebreaker && (
-                  <span className="tiebreaker-hint podium-tiebreaker">{tiebreaker}</span>
-                )}
+                <span className={`tiebreaker-hint podium-tiebreaker${tiebreaker ? '' : ' is-empty'}`}>
+                  {tiebreaker || ' '}
+                </span>
               </div>
             )
           })}
