@@ -322,26 +322,28 @@ export default function App() {
       )}
 
       {/* Header */}
-      <header className="header" style={{ flexWrap: 'wrap' }}>
-        <div className="brand">
-          <img src="/fifa-world-cup-2026-logo.png" alt="WC2026 Logo" className="logo" />
-          <h1>World Cup 2026 Fantasy</h1>
-        </div>
-        {!user && <button className="signin-btn" onClick={() => setShowAuthModal(true)}>Sign in</button>}
-        {user && (
-          <div className="user-bar">
-            <div className="user-avatar" title={displayName ?? user.email}>
-              {(() => {
-                const name = displayName ?? user.email ?? ''
-                const parts = name.split(/[\s@]/).filter(Boolean)
-                return parts.length >= 2
-                  ? (parts[0][0] + parts[1][0]).toUpperCase()
-                  : name.slice(0, 2).toUpperCase()
-              })()}
-            </div>
-            <button className="signout-btn" onClick={handleLogout}>Sign Out</button>
+      <header className="header">
+        <div className="header-top">
+          <div className="brand">
+            <img src="/fifa-world-cup-2026-logo.png" alt="WC2026 Logo" className="logo" />
+            <h1>World Cup 2026 Fantasy</h1>
           </div>
-        )}
+          {!user && <button className="signin-btn" onClick={() => setShowAuthModal(true)}>Sign in</button>}
+          {user && (
+            <div className="user-bar">
+              <div className="user-avatar" title={displayName ?? user.email}>
+                {(() => {
+                  const name = displayName ?? user.email ?? ''
+                  const parts = name.split(/[\s@]/).filter(Boolean)
+                  return parts.length >= 2
+                    ? (parts[0][0] + parts[1][0]).toUpperCase()
+                    : name.slice(0, 2).toUpperCase()
+                })()}
+              </div>
+              <button className="signout-btn" onClick={handleLogout}>Sign Out</button>
+            </div>
+          )}
+        </div>
         <HeaderCountdown />
       </header>
 
