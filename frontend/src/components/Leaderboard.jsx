@@ -42,12 +42,37 @@ const PODIUM_ORDER = [1, 0, 2]
 
 const POLL_INTERVAL_MS = 30_000
 
-export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWorks }) {
+export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWorks, user }) {
   const [entries, setEntries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [memberIds, setMemberIds] = useState(null)
+  const [userCount, setUserCount] = useState(null)
   const lastEntryCount = useRef(5)
+
+  useEffect(() => {
+    let cancelled = false
+    supabase.rpc('get_user_count').then(({ data, error: countError }) => {
+      if (cancelled || countError) return
+      setUserCount(typeof data === 'number' ? data : Number(data))
+    })
+    return () => { cancelled = true }
+  }, [])
+
+  const socialProof = userCount != null && userCount >= 10 ? (
+    <div
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: '13px',
+        color: 'var(--gray-400)',
+        textAlign: 'center',
+        marginBottom: '16px',
+      }}
+    >
+      <span style={{ fontWeight: 700, color: 'var(--green)' }}>{userCount}</span>
+      {user ? ' players and counting' : ' players have joined the fun'}
+    </div>
+  ) : null
 
   // Resolve league members once per selected group; only re-runs when the group changes.
   useEffect(() => {
@@ -116,6 +141,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
     return (
       <div className="leaderboard">
         <h2 className="leaderboard-title">Leaderboard</h2>
+        {socialProof}
         {Array.from({ length: lastEntryCount.current }).map((_, i) => (
           <div key={i} className="skeleton-row" />
         ))}
@@ -127,6 +153,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
     return (
       <div className="leaderboard">
         <h2 className="leaderboard-title">Leaderboard</h2>
+        {socialProof}
         <div className="error-banner">{error}</div>
       </div>
     )
@@ -136,6 +163,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
     return (
       <div className="leaderboard">
         <h2 className="leaderboard-title">Leaderboard</h2>
+        {socialProof}
         <div className="empty-state">
           <div className="empty-state-icon">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -166,6 +194,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
   return (
     <div className="leaderboard">
       <h2 className="leaderboard-title">Leaderboard</h2>
+      {socialProof}
       <p className="leaderboard-tiebreak-note">
         Tied on points? See{' '}
         <button type="button" className="tiebreak-note-link" onClick={onShowHowItWorks}>

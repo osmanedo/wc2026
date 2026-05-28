@@ -433,6 +433,7 @@ export default function App() {
               selectedGroup={selectedLeague}
               hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
               onShowHowItWorks={() => setShowHowItWorks(true)}
+              user={user}
             />
             {!user && (
               <div className="leaderboard-signin-cta">
