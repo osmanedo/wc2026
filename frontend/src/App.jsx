@@ -46,6 +46,53 @@ const TrophyIcon = () => (
   </svg>
 )
 
+function HeaderCountdown() {
+  const target = new Date('2026-06-11T16:00:00Z').getTime()
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60000)
+    return () => clearInterval(id)
+  }, [])
+
+  const diff = target - now
+  if (diff <= 0) return null
+
+  const days = Math.floor(diff / 86400000)
+  const hours = Math.floor((diff % 86400000) / 3600000)
+  const minutes = Math.floor((diff % 3600000) / 60000)
+  const pad = (n) => String(n).padStart(2, '0')
+
+  const num = { color: 'white' }
+
+  return (
+    <div style={{
+      width: '100%',
+      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+      padding: '8px 0 0 0',
+      marginTop: 10,
+      textAlign: 'center',
+    }}>
+      <div style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontWeight: 700,
+        fontSize: 13,
+        color: 'rgba(255, 255, 255, 0.7)',
+      }}>
+        <span style={num}>{days}</span> Days <span style={num}>{pad(hours)}</span> Hours <span style={num}>{pad(minutes)}</span> Minutes to kickoff
+      </div>
+      <div style={{
+        fontFamily: "'DM Sans', sans-serif",
+        fontSize: 11,
+        color: 'rgba(255, 255, 255, 0.5)',
+        marginTop: 4,
+      }}>
+        Get your first prediction in before kick off
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [view, setView] = useState('fixtures')
   const [matches, setMatches] = useState([])
@@ -275,7 +322,7 @@ export default function App() {
       )}
 
       {/* Header */}
-      <header className="header">
+      <header className="header" style={{ flexWrap: 'wrap' }}>
         <div className="brand">
           <img src="/fifa-world-cup-2026-logo.png" alt="WC2026 Logo" className="logo" />
           <h1>World Cup 2026 Fantasy</h1>
@@ -295,6 +342,7 @@ export default function App() {
             <button className="signout-btn" onClick={handleLogout}>Sign Out</button>
           </div>
         )}
+        <HeaderCountdown />
       </header>
 
       {/* Views */}
