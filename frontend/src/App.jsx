@@ -205,15 +205,20 @@ export default function App() {
         const leagues = data?.map(m => m.group) || []
         if (leagues.length === 0) { setUserLeagues([]); return }
         const leagueIds = leagues.map(g => g.id)
-        const { data: countRows } = await supabase
+        const { data: memberRows } = await supabase
           .from("group_members")
-          .select("group_id")
+          .select("group_id, profiles(display_name, avatar_url)")
           .in("group_id", leagueIds)
-        const countMap = (countRows || []).reduce((acc, r) => {
-          acc[r.group_id] = (acc[r.group_id] || 0) + 1
+        const membersMap = (memberRows || []).reduce((acc, r) => {
+          if (!acc[r.group_id]) acc[r.group_id] = []
+          if (r.profiles) acc[r.group_id].push(r.profiles)
           return acc
         }, {})
-        setUserLeagues(leagues.map(g => ({ ...g, member_count: countMap[g.id] || 0 })))
+        setUserLeagues(leagues.map(g => ({
+          ...g,
+          member_count: (membersMap[g.id] || []).length,
+          members: membersMap[g.id] || [],
+        })))
       })
     supabase
       .from("profiles")
@@ -444,13 +449,44 @@ export default function App() {
               ) : (
                 userLeagues.map(league => (
                   <div key={league.id} className="league-card">
-                    <div>
+                    <div className="league-card-main">
                       <div className="league-card-name">{league.name}</div>
                       <div className="league-card-code">{league.member_count != null ? `${league.member_count} members` : 'Tap code to copy'}</div>
                     </div>
                     <button className={`code-badge${copiedCode === league.code ? ' copied' : ''}`} onClick={() => copyCode(league.code)}>
                      {copiedCode === league.code ? 'Copied!' : league.code}
                     </button>
+                    {league.members && league.members.length > 0 && (
+                      <div className="league-card-members">
+                        {league.members.map((m, i) => {
+                          const name = m.display_name || '?'
+                          const initial = name.charAt(0).toUpperCase()
+                          return (
+                            <div key={i} className="league-member">
+                              {m.avatar_url ? (
+                                <img
+                                  className="league-member-avatar"
+                                  src={m.avatar_url}
+                                  alt=""
+                                  onError={(e) => {
+                                    const img = e.currentTarget
+                                    const fallback = document.createElement('div')
+                                    fallback.className = 'league-member-avatar league-member-avatar-fallback'
+                                    fallback.textContent = initial
+                                    img.replaceWith(fallback)
+                                  }}
+                                />
+                              ) : (
+                                <div className="league-member-avatar league-member-avatar-fallback">
+                                  {initial}
+                                </div>
+                              )}
+                              <span className="league-member-name">{name}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
               ))
             )}
