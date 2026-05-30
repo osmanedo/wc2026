@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import './LeaguePanel.css'
 
@@ -33,13 +33,16 @@ export default function LeaguePanel({ user, onClose, initialJoinCode }) {
   const [message, setMessage] = useState('')
   const [createdCode, setCreatedCode] = useState(null)
   const [copied, setCopied] = useState(false)
+  const [joining, setJoining] = useState(Boolean(initialJoinCode))
+  const autoJoinedRef = useRef(false)
 
-  // If a deep link code was passed in, prompt the user immediately
+  // If a deep link code was passed in, auto-join immediately
   useEffect(() => {
-    if (initialJoinCode) {
-      setJoinCode(initialJoinCode)
-      setMode('join')
-    }
+    if (!initialJoinCode || autoJoinedRef.current) return
+    autoJoinedRef.current = true
+    setJoinCode(initialJoinCode)
+    setMode('join')
+    handleJoin(initialJoinCode, { autoClose: true })
   }, [initialJoinCode])
 
   const handleCreate = async () => {
@@ -74,22 +77,37 @@ export default function LeaguePanel({ user, onClose, initialJoinCode }) {
     setMessage('')
   }
 
-  const handleJoin = async () => {
+  const handleJoin = async (codeOverride, opts = {}) => {
+    const code = (codeOverride ?? joinCode).toUpperCase()
     const { data: league, error } = await supabase
       .from("groups").select("*")
-      .eq("code", joinCode.toUpperCase())
+      .eq("code", code)
       .single()
 
-    if (error || !league) { setMessage("League not found — check the code"); return }
+    if (error || !league) {
+      setMessage("League not found — check the code")
+      sessionStorage.removeItem('pendingJoinCode')
+      setJoining(false)
+      return
+    }
 
     const { error: joinError } = await supabase
       .from("group_members")
       .insert({ group_id: league.id, user_id: user.id })
 
-    if (joinError) { setMessage("You may already be in this league"); return }
+    if (joinError) {
+      setMessage("You may already be in this league")
+      sessionStorage.removeItem('pendingJoinCode')
+      setJoining(false)
+      return
+    }
 
     sessionStorage.removeItem('pendingJoinCode')
     setMessage(`Joined "${league.name}" successfully!`)
+    setJoining(false)
+    if (opts.autoClose) {
+      setTimeout(() => onClose?.(), 1500)
+    }
   }
 
   const shareLink = createdCode ? `${APP_URL}/?join=${createdCode}` : ''
@@ -108,6 +126,17 @@ export default function LeaguePanel({ user, onClose, initialJoinCode }) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
+  }
+
+  // If we're auto-joining via a deep link, show a minimal status state
+  if (joining) {
+    return (
+      <div className="league-panel">
+        <h3 className="panel-title">Joining league…</h3>
+        <p className="panel-message">Adding you to <strong>{(initialJoinCode ?? joinCode).toUpperCase()}</strong></p>
+        {message && <p className="panel-message">{message}</p>}
+      </div>
+    )
   }
 
   // If a league was just created, show the share card instead of the form
