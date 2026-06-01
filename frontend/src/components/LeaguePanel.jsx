@@ -209,7 +209,7 @@ export default function LeaguePanel({ user, onClose, initialJoinCode }) {
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value)}
           />
-          <button className="panel-submit-btn" onClick={handleJoin}>
+          <button className="panel-submit-btn" onClick={() => handleJoin()}>
             Join League
           </button>
         </>
