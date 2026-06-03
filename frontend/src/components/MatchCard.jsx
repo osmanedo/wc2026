@@ -3,7 +3,7 @@ import ScorePicker from './ScorePicker'
 import AIBrief from './AIBrief'
 import './MatchCard.css'
 
-export default function MatchCard({ match, user, existingPick, onPickSubmitted, onSignIn }) {
+export default function MatchCard({ match, user, existingPick, onPickSubmitted, onSignIn, showBriefs = true }) {
   const [showPicker, setShowPicker] = useState(false)
   const [showBrief, setShowBrief] = useState(false)
   const [now, setNow] = useState(Date.now())
@@ -115,15 +115,17 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
           ) : null}
         </div>
 
-        <button
-          className="ai-brief-btn"
-          onClick={(e) => {
-            e.stopPropagation()
-            setShowBrief(true)
-          }}
-        >
-          AI Brief & Prediction
-        </button>
+        {showBriefs && (
+          <button
+            className="ai-brief-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowBrief(true)
+            }}
+          >
+            AI Brief & Prediction
+          </button>
+        )}
       </div>
 
       {showPicker && (

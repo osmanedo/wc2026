@@ -104,6 +104,8 @@ export default function App() {
   const [userLeagues, setUserLeagues] = useState([])
   const [leaguesError, setLeaguesError] = useState(null)
   const [displayName, setDisplayName] = useState(null)
+  const [showAiBriefs, setShowAiBriefs] = useState(null)
+  const [aiBriefError, setAiBriefError] = useState(null)
   const [copiedCode, setCopiedCode] = useState(null)
   const [filterDate, setFilterDate] = useState('all')
   const [filterTeam, setFilterTeam] = useState('all')
@@ -269,10 +271,13 @@ export default function App() {
       })
     supabase
       .from("profiles")
-      .select("display_name")
+      .select("display_name, show_ai_briefs")
       .eq("id", user.id)
       .single()
-      .then(({ data }) => setDisplayName(data?.display_name ?? null))
+      .then(({ data }) => {
+        setDisplayName(data?.display_name ?? null)
+        setShowAiBriefs(data?.show_ai_briefs ?? true)
+      })
     fetchPicks()
   }, [user])
 
@@ -294,6 +299,25 @@ export default function App() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
+  }
+
+  const showBriefs = showAiBriefs ?? true
+
+  const toggleAiBriefs = async () => {
+    if (!user) return
+    const prev = showBriefs
+    const next = !prev
+    setShowAiBriefs(next)
+    setAiBriefError(null)
+    const { error } = await supabase
+      .from("profiles")
+      .update({ show_ai_briefs: next })
+      .eq("id", user.id)
+    if (error) {
+      setShowAiBriefs(prev)
+      setAiBriefError('Could not save preference')
+      setTimeout(() => setAiBriefError(null), 3000)
+    }
   }
 
   return (
@@ -384,7 +408,25 @@ export default function App() {
                     </select>
                   )}
                 </div>
-                <button className="hiw-icon-btn" onClick={() => setShowHowItWorks(true)} title="How it works">ⓘ</button>
+                <div className="fixtures-filters-gutter">
+                  <button className="hiw-icon-btn" onClick={() => setShowHowItWorks(true)} title="How it works">ⓘ</button>
+                  {user && (
+                    <div className="ai-brief-toggle">
+                      <span className="ai-brief-toggle-label">AI Brief</span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={showBriefs}
+                        title="Show AI Brief & Prediction on fixtures"
+                        className={`ai-brief-switch${showBriefs ? ' on' : ''}`}
+                        onClick={toggleAiBriefs}
+                      >
+                        <span className="ai-brief-knob" />
+                      </button>
+                      {aiBriefError && <span className="ai-brief-toggle-error">{aiBriefError}</span>}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             {loadingMatches && !matchesError ? (
@@ -403,6 +445,7 @@ export default function App() {
                         existingPick={picks.find(pick => pick.match_id === match.id)}
                         onPickSubmitted={fetchPicks}
                         onSignIn={() => setShowAuthModal(true)}
+                        showBriefs={showBriefs}
                       />
                     ))}
                   </div>
