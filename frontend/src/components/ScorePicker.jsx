@@ -3,8 +3,11 @@ import { supabase } from '../lib/supabase'
 import './ScorePicker.css'
 
 export default function ScorePicker({ match, user, existingPick, onPickSubmitted, onClose }) {
-  const [homeScore, setHomeScore] = useState(0)
-  const [awayScore, setAwayScore] = useState(0)
+  // Load initial state from existingPick (if editing) or defaults (if new pick).
+  // Previously these defaulted to 0 always — clicking "edit" then "submit" without
+  // changing anything would silently overwrite a saved pick with 0-0.
+  const [homeScore, setHomeScore] = useState(existingPick?.pick_home ?? 0)
+  const [awayScore, setAwayScore] = useState(existingPick?.pick_away ?? 0)
   // pick_winner is only meaningful on knockout draws. Load it from a saved
   // pick (NULL for old picks and non-draw picks — that's fine).
   const [pickWinner, setPickWinner] = useState(existingPick?.pick_winner ?? null)
@@ -43,15 +46,24 @@ export default function ScorePicker({ match, user, existingPick, onPickSubmitted
       pick_home: homeScore,
       pick_away: awayScore,
       pick_winner: showAdvancer ? pickWinner : null
-    }, { onConflict: 'user_id, match_id' })
+    }, { onConflict: 'user_id,match_id' })
     setSubmitting(false)
 
     if (error) {
+      console.error('Pick upsert failed:', error)
       showToast('Failed to submit pick.')
     } else {
       onPickSubmitted()
     }
   }
+
+  // Button label adapts to context: edit vs new, and signals when the advancer
+  // selection is still missing (soft prompt, doesn't block submission).
+  const submitLabel = submitting
+    ? 'Submitting…'
+    : existingPick
+      ? 'Update Tip'
+      : 'Submit Tip'
 
   return (
     <div className="score-picker-overlay" onClick={onClose}>
@@ -110,10 +122,15 @@ export default function ScorePicker({ match, user, existingPick, onPickSubmitted
                 {match.away_team.name}
               </button>
             </div>
+            {!pickWinner && (
+              <p className="advancer-missing-hint">
+                Tip: pick who advances to be eligible for the bonus point.
+              </p>
+            )}
           </div>
         )}
         <button className="submit-btn" onClick={handleSubmit} disabled={submitting}>
-          {submitting ? 'Submitting…' : 'Submit Tip'}
+          {submitLabel}
         </button>
         {toast && <div className="toast">{toast}</div>}
       </div>

@@ -13,7 +13,7 @@ SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 # Step 2 — create Supabase client (use service key)
 supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
-# Step 3 — get matches already marked FINISHED in our DB (so we know which ones are NEW)
+# Step 3 — get matches already marked FINISHED in our DB
 already_finished = (
     supabase.table("matches")
     .select("id")
@@ -29,50 +29,60 @@ response = requests.get(
 )
 
 results_data = response.json()
+print(f"Processed {len(results_data['matches'])} matches from football-data.org")
 
 # Step 5 — loop through matches and sync scores + status
-# FINISHED:      write final scores, calculate points, flag for summary generation
-# IN_PLAY/PAUSED: write live scores and status so leaderboard view reflects current game
 newly_finished = []
 
 for match in results_data["matches"]:
     status = match["status"]
-    score  = match["score"]["fullTime"]
+    score  = match["score"]  # full score object
 
     if status == "FINISHED":
-        full_score = match["score"]
-        duration   = full_score["duration"]
+        duration = score["duration"]
 
         # Group stage and knockouts decided in 90 use fullTime
         # (regularTime is null in these cases).
         # Knockouts past 90 use end-of-ET (regularTime + extraTime),
         # excluding penalty goals.
         if duration == "REGULAR":
-            home_score = full_score["fullTime"]["home"]
-            away_score = full_score["fullTime"]["away"]
+            home_score = score["fullTime"]["home"]
+            away_score = score["fullTime"]["away"]
         else:  # EXTRA_TIME or PENALTY_SHOOTOUT
-            regular = full_score["regularTime"]
-            extra   = full_score["extraTime"]
+            regular = score["regularTime"]
+            extra   = score["extraTime"]
             home_score = regular["home"] + extra["home"]
             away_score = regular["away"] + extra["away"]
 
+        # Always update the score so any post-match corrections from football-data.org flow through
         supabase.table("matches").update({
             "home_score": home_score,
             "away_score": away_score,
-            "winner": full_score["winner"],  # HOME_TEAM, AWAY_TEAM, or DRAW
+            "winner": score["winner"],  # HOME_TEAM, AWAY_TEAM, or DRAW
             "status": status
         }).eq("id", match["id"]).execute()
 
-        supabase.rpc("calculate_points", {"match_id_input": match["id"]}).execute()
-
+        # Only run points calculation for matches that just transitioned to FINISHED
         if match["id"] not in already_finished_ids:
+            supabase.rpc("calculate_points", {"match_id_input": match["id"]}).execute()
             newly_finished.append(match["id"])
 
-    elif status in ("IN_PLAY", "PAUSED"):
-        # score.fullTime holds the current live score in football-data.org v4
+    elif status in ("IN_PLAY", "PAUSED", "EXTRA_TIME"):
+        # score.fullTime is the current cumulative live score (including any ET goals as they happen)
         supabase.table("matches").update({
-            "home_score": score["home"],
-            "away_score": score["away"],
+            "home_score": score["fullTime"]["home"],
+            "away_score": score["fullTime"]["away"],
+            "status": status
+        }).eq("id", match["id"]).execute()
+
+    elif status == "PENALTY_SHOOTOUT":
+        # During a live pen shootout, keep displaying the end-of-ET score (excluding pen goals)
+        # so the score field stays stable. The status field signals to the UI that pens are happening.
+        regular = score["regularTime"]
+        extra   = score["extraTime"]
+        supabase.table("matches").update({
+            "home_score": regular["home"] + extra["home"],
+            "away_score": regular["away"] + extra["away"],
             "status": status
         }).eq("id", match["id"]).execute()
 

@@ -217,3 +217,9 @@
 .pick-action-left .locked-badge {
   margin-top: 0;
 }
+
+.pick-advancer-tag {
+  font-size: 0.85em;
+  color: var(--green);
+  margin-left: 0.4em;
+}

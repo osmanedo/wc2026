@@ -38,17 +38,37 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
 
   const getResult = (home, away) => home > away ? 'HOME' : away > home ? 'AWAY' : 'DRAW'
 
+  // Mirrors the server-side calculate_points function. Used as a fallback for
+  // the (very narrow) window between the score being set in the DB and
+  // calculate_points populating points_earned. If the two ever drift, the
+  // server is the source of truth — this is only a stopgap for display.
   const computePoints = () => {
     if (!existingPick || match.home_score == null || match.away_score == null) return null
     if (existingPick.points_earned != null) return existingPick.points_earned
+
     const multiplier = match.stage === 'FINAL' ? 3
-      : ['LAST_32','LAST_16','QUARTER_FINALS','SEMI_FINALS'].includes(match.stage) ? 2
+      : ['LAST_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE'].includes(match.stage) ? 2
       : 1
-    if (existingPick.pick_home === match.home_score && existingPick.pick_away === match.away_score)
-      return 5 * multiplier
-    if (getResult(existingPick.pick_home, existingPick.pick_away) === getResult(match.home_score, match.away_score))
-      return 2 * multiplier
-    return 0
+
+    // Score-based base points
+    let base = 0
+    if (existingPick.pick_home === match.home_score && existingPick.pick_away === match.away_score) {
+      base = 5
+    } else if (getResult(existingPick.pick_home, existingPick.pick_away) === getResult(match.home_score, match.away_score)) {
+      base = 2
+    }
+
+    // Advancement bonus (knockouts only). Requires the match.winner field to be set.
+    let bonus = 0
+    if (match.stage !== 'GROUP_STAGE' && match.winner) {
+      const predictedAdvancer =
+        existingPick.pick_home > existingPick.pick_away ? 'HOME_TEAM' :
+        existingPick.pick_away > existingPick.pick_home ? 'AWAY_TEAM' :
+        existingPick.pick_winner
+      if (predictedAdvancer && predictedAdvancer === match.winner) bonus = 1
+    }
+
+    return (base + bonus) * multiplier
   }
 
   const pointsEarned = computePoints()
@@ -60,6 +80,26 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
     if (hours > 0) return `Kicks off in ${hours}h ${mins}m - Tip Soon!`
     if (totalMins > 0) return `Kicks off in ${totalMins}m - Tip Now!`
     return 'Kicking off soon - Finalise your tip!'
+  }
+
+  // Surface the advancement pick alongside the score so users can see it
+  // without having to re-open the picker. Only relevant for knockout draws.
+  const advancerName = existingPick?.pick_winner === 'HOME_TEAM'
+    ? match.home_team.name
+    : existingPick?.pick_winner === 'AWAY_TEAM'
+      ? match.away_team.name
+      : null
+
+  const renderPickDisplay = () => {
+    if (!existingPick) return null
+    return (
+      <>
+        ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+        {advancerName && (
+          <span className="advancer-hint"> ({advancerName} to advance)</span>
+        )}
+      </>
+    )
   }
 
   return (
@@ -88,19 +128,19 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
         <div className="pick-action-left">
           {existingPick && isFinished ? (
             <div className="pick-display">
-              ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+              {renderPickDisplay()}
               {pointsEarned != null && (
                 <span className="points-badge">{pointsEarned} pts</span>
               )}
             </div>
           ) : existingPick && canPick ? (
             <div className="pick-display" style={{ cursor: 'pointer' }} onClick={() => setShowPicker(true)}>
-              ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+              {renderPickDisplay()}
               <span className="edit-hint">Tap to edit</span>
             </div>
           ) : existingPick ? (
             <div className="pick-display">
-              ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
+              {renderPickDisplay()}
             </div>
           ) : !canPick && !isFinished ? (
             <div className="locked-badge">🔒 Locked</div>
