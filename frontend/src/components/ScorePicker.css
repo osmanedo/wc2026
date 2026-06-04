@@ -144,6 +144,12 @@
   margin-bottom: 12px;
 }
 
+.advancer-missing-hint {
+  font-size: 0.85em;
+  color: var(--gray-800);
+  margin-top: 0.5rem;
+}
+
 .advancer-options {
   display: flex;
   gap: 10px;

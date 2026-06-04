@@ -96,7 +96,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
       <>
         ✓ Your pick: {existingPick.pick_home} - {existingPick.pick_away}
         {advancerName && (
-          <span className="advancer-hint"> ({advancerName} to advance)</span>
+          <span className="pick-advancer-tag"> ({advancerName} to advance)</span>
         )}
       </>
     )
