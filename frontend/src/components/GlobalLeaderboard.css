@@ -1,0 +1,171 @@
+/* Smart (global) leaderboard — compact, mobile-first rows.
+   Scoped under gl- prefix so it never touches the private-league
+   Leaderboard styles. */
+
+.gl-social-proof {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--gray-400);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.gl-social-proof-count {
+  font-weight: 700;
+  color: var(--green);
+}
+
+.gl-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Compact row: rank | name (truncates) | points */
+.gl-row {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-left: 3px solid transparent;
+}
+
+.gl-rank {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-400);
+  min-width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.gl-name {
+  flex: 1;
+  min-width: 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gl-you {
+  flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--green);
+  background: rgba(82, 183, 136, 0.16);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+.gl-points {
+  flex-shrink: 0;
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--green);
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.gl-points-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--gray-400);
+}
+
+/* Current user highlight — subtle accent border + faint green tint */
+.gl-row--me {
+  border-left-color: var(--green-accent);
+  background: rgba(82, 183, 136, 0.10);
+}
+
+/* Gap divider between the top block and the user's neighborhood */
+.gl-divider {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--gray-400);
+  text-align: center;
+  margin: 10px 0;
+}
+
+.gl-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--gray-600);
+  text-align: center;
+  padding: 12px 16px;
+  margin-top: 10px;
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Text-style toggle / navigation buttons */
+.gl-toggle,
+.gl-back {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 14px 0 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green);
+  text-align: center;
+}
+
+.gl-back {
+  text-align: left;
+  padding: 0 0 14px;
+  font-size: 13px;
+}
+
+.gl-toggle:hover,
+.gl-back:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.gl-load-more {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.gl-load-more:hover:not(:disabled) {
+  border-color: var(--green-accent);
+}
+
+.gl-load-more:disabled {
+  color: var(--gray-400);
+  cursor: default;
+}
+
+.gl-skeleton {
+  height: 48px;
+}

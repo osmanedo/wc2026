@@ -14,6 +14,7 @@ import { supabase } from './lib/supabase'
 import Auth from './components/Auth'
 import MatchCard from './components/MatchCard'
 import Leaderboard from './components/Leaderboard'
+import GlobalLeaderboard from './components/GlobalLeaderboard'
 import LeaguePanel from './components/LeaguePanel'
 import HowItWorks from './components/HowItWorks'
 
@@ -474,12 +475,20 @@ export default function App() {
               ))}
               </div>
             )}
-            <Leaderboard
-              selectedGroup={selectedLeague}
-              hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
-              onShowHowItWorks={() => setShowHowItWorks(true)}
-              user={user}
-            />
+            {selectedLeague ? (
+              <Leaderboard
+                selectedGroup={selectedLeague}
+                hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
+                onShowHowItWorks={() => setShowHowItWorks(true)}
+                user={user}
+              />
+            ) : (
+              <GlobalLeaderboard
+                hasLiveMatch={matches.some(m => m.status !== 'TIMED' && m.status !== 'FINISHED')}
+                onShowHowItWorks={() => setShowHowItWorks(true)}
+                user={user}
+              />
+            )}
             {!user && (
               <div className="leaderboard-signin-cta">
                 <p className="leaderboard-signin-cta-text">Submit picks and climb the rankings</p>
