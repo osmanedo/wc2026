@@ -40,9 +40,26 @@ for match in results_data["matches"]:
     score  = match["score"]["fullTime"]
 
     if status == "FINISHED":
+        full_score = match["score"]
+        duration   = full_score["duration"]
+
+        # Group stage and knockouts decided in 90 use fullTime
+        # (regularTime is null in these cases).
+        # Knockouts past 90 use end-of-ET (regularTime + extraTime),
+        # excluding penalty goals.
+        if duration == "REGULAR":
+            home_score = full_score["fullTime"]["home"]
+            away_score = full_score["fullTime"]["away"]
+        else:  # EXTRA_TIME or PENALTY_SHOOTOUT
+            regular = full_score["regularTime"]
+            extra   = full_score["extraTime"]
+            home_score = regular["home"] + extra["home"]
+            away_score = regular["away"] + extra["away"]
+
         supabase.table("matches").update({
-            "home_score": score["home"],
-            "away_score": score["away"],
+            "home_score": home_score,
+            "away_score": away_score,
+            "winner": full_score["winner"],  # HOME_TEAM, AWAY_TEAM, or DRAW
             "status": status
         }).eq("id", match["id"]).execute()
 

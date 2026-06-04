@@ -132,6 +132,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
         <ScorePicker
           match={match}
           user={user}
+          existingPick={existingPick}
           onPickSubmitted={() => {
             setShowPicker(false)
             onPickSubmitted()

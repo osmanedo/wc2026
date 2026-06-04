@@ -125,6 +125,50 @@
   text-align: center;
 }
 
+.advancer-picker {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.advancer-label {
+  font-size: 11px;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.advancer-hint {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-bottom: 12px;
+}
+
+.advancer-options {
+  display: flex;
+  gap: 10px;
+}
+
+.advancer-btn {
+  flex: 1;
+  padding: 12px 8px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.advancer-btn.selected {
+  border-color: var(--green);
+  background: var(--green);
+  color: white;
+}
+
 .submit-btn {
   width: 100%;
   padding: 14px;
