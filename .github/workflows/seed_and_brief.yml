@@ -1,7 +1,7 @@
 name: Seed Matches & Generate Briefs
 on:
-  #schedule:
-   # - cron: '0 6 * * *'     # daily at 6am UTC (4pm AEST)
+  schedule:
+    - cron: '0 6 * * *'     # daily at 6am UTC (4pm AEST)
   workflow_dispatch:          # allows manual trigger from GitHub
 jobs:
   seed-and-brief:
