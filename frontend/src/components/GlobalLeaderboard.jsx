@@ -9,19 +9,6 @@ const PAGE_SIZE = 50
 const POLL_INTERVAL_MS = 30_000
 const SKELETON_ROWS = 8
 
-// Full-view ordering mirrors the tiebreaker chain inside
-// get_leaderboard_neighborhood so offset-based ranks line up with the
-// neighborhood ranks. (Alphabetical fallback is left to the DB's natural
-// order — acceptable for fully-tied rows in the paginated list.)
-const ORDER_CHAIN = [
-  'total_points',
-  'exact_scores',
-  'correct_results',
-  'best_single_match',
-  'current_streak',
-  'accuracy_pct',
-]
-
 function LeaderRow({ entry, rank, isCurrentUser }) {
   return (
     <div className={`gl-row${isCurrentUser ? ' gl-row--me' : ''}`}>
@@ -128,18 +115,14 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
   }, [mode, fetchNeighborhood, hasLiveMatch])
 
   // --- Full paginated view ------------------------------------------------
+  // Uses get_leaderboard_page RPC so the full tiebreaker chain (including
+  // alphabetical fallback on display_name) is applied server-side, matching
+  // the ordering produced by get_leaderboard_neighborhood.
   const fetchFullPage = useCallback(async (offset) => {
-    let query = supabase
-      .from('leaderboard')
-      .select('*, profile:profiles(display_name, avatar_url)')
-    for (const col of ORDER_CHAIN) {
-      query = query.order(col, { ascending: false })
-    }
-    // Stable final tiebreaker so fully-tied rows keep a consistent order
-    // across paginated .range() requests (avoids duplicate/skipped rows).
-    query = query.order('user_id', { ascending: true })
-    query = query.range(offset, offset + PAGE_SIZE - 1)
-    return query
+    return supabase.rpc('get_leaderboard_page', {
+      p_offset: offset,
+      p_limit: PAGE_SIZE,
+    })
   }, [])
 
   const openFullView = useCallback(async () => {
@@ -255,7 +238,7 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
               <LeaderRow
                 key={entry.user_id}
                 entry={entry}
-                rank={i + 1}
+                rank={entry.rank ?? i + 1}
                 isCurrentUser={user?.id === entry.user_id}
               />
             ))}

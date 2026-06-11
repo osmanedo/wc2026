@@ -149,7 +149,7 @@ def build_user_prompt(match):
 
 In plain prose, cover: the vibe and what's at stake, a line on head-to-head history \
 and recent form, one or two key players per side, predicted odds as percentages \
-(home win / draw / away win), and your specific predicted scoreline. \
+(home win / draw / away win), and your specific predicted scoreline, take risks on the scoreline while being analytical. \
 End with a sharp tip — but sneak in a cheeky nod to the underdog."""
 
 
