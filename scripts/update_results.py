@@ -13,7 +13,6 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
 # Step 2 — create Supabase client (use service key)
-# Step 2 — create Supabase client (use service key)
 supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
 # Step 2.5 — live-match gate: exit early if nothing is live or imminent
@@ -44,18 +43,22 @@ if not live.data and not imminent.data:
     print("No live or imminent matches — exiting cleanly")
     sys.exit(0)
 
-# Step 3 — get matches already marked FINISHED in our DB
-
-# Step 3 — get matches already marked FINISHED in our DB
-already_finished = (
+# Step 3 — load current state for all matches (used for change detection)
+current_state_resp = (
     supabase.table("matches")
-    .select("id")
-    .eq("status", "FINISHED")
+    .select("id, status, home_score, away_score")
     .execute()
 )
-already_finished_ids = {row["id"] for row in already_finished.data}
+current_state = {
+    row["id"]: {
+        "status": row["status"],
+        "home_score": row["home_score"],
+        "away_score": row["away_score"],
+    }
+    for row in current_state_resp.data
+}
+already_finished_ids = {mid for mid, s in current_state.items() if s["status"] == "FINISHED"}
 
-# Step 4 — call football-data.org matches endpoint
 # Step 4 — call football-data.org matches endpoint
 try:
     response = requests.get(
@@ -74,11 +77,16 @@ except requests.exceptions.RequestException as e:
 print(f"Processed {len(results_data['matches'])} matches from football-data.org")
 
 # Step 5 — loop through matches and sync scores + status
+# Each branch computes new values first, then writes only if they differ
+# from what's already in the DB — avoids redundant Realtime pushes
 newly_finished = []
+writes_skipped = 0
 
 for match in results_data["matches"]:
     status = match["status"]
     score  = match["score"]  # full score object
+    match_id = match["id"]
+    current = current_state.get(match_id, {})
 
     if status == "FINISHED":
         duration = score["duration"]
@@ -96,37 +104,66 @@ for match in results_data["matches"]:
             home_score = regular["home"] + extra["home"]
             away_score = regular["away"] + extra["away"]
 
-        # Always update the score so any post-match corrections from football-data.org flow through
-        supabase.table("matches").update({
-            "home_score": home_score,
-            "away_score": away_score,
-            "winner": score["winner"],  # HOME_TEAM, AWAY_TEAM, or DRAW
-            "status": status
-        }).eq("id", match["id"]).execute()
+        # Only write if status or score changed — catches post-match corrections
+        # from football-data.org without re-pushing unchanged rows every poll
+        if (
+            current.get("status") != status
+            or current.get("home_score") != home_score
+            or current.get("away_score") != away_score
+        ):
+            supabase.table("matches").update({
+                "home_score": home_score,
+                "away_score": away_score,
+                "winner": score["winner"],  # HOME_TEAM, AWAY_TEAM, or DRAW
+                "status": status
+            }).eq("id", match_id).execute()
+        else:
+            writes_skipped += 1
 
         # Only run points calculation for matches that just transitioned to FINISHED
-        if match["id"] not in already_finished_ids:
-            supabase.rpc("calculate_points", {"match_id_input": match["id"]}).execute()
-            newly_finished.append(match["id"])
+        if match_id not in already_finished_ids:
+            supabase.rpc("calculate_points", {"match_id_input": match_id}).execute()
+            newly_finished.append(match_id)
 
     elif status in ("IN_PLAY", "PAUSED", "EXTRA_TIME"):
         # score.fullTime is the current cumulative live score (including any ET goals as they happen)
-        supabase.table("matches").update({
-            "home_score": score["fullTime"]["home"],
-            "away_score": score["fullTime"]["away"],
-            "status": status
-        }).eq("id", match["id"]).execute()
+        new_home = score["fullTime"]["home"]
+        new_away = score["fullTime"]["away"]
+        if (
+            current.get("status") != status
+            or current.get("home_score") != new_home
+            or current.get("away_score") != new_away
+        ):
+            supabase.table("matches").update({
+                "home_score": new_home,
+                "away_score": new_away,
+                "status": status
+            }).eq("id", match_id).execute()
+        else:
+            writes_skipped += 1
 
     elif status == "PENALTY_SHOOTOUT":
         # During a live pen shootout, keep displaying the end-of-ET score (excluding pen goals)
         # so the score field stays stable. The status field signals to the UI that pens are happening.
         regular = score["regularTime"]
         extra   = score["extraTime"]
-        supabase.table("matches").update({
-            "home_score": regular["home"] + extra["home"],
-            "away_score": regular["away"] + extra["away"],
-            "status": status
-        }).eq("id", match["id"]).execute()
+        new_home = regular["home"] + extra["home"]
+        new_away = regular["away"] + extra["away"]
+        if (
+            current.get("status") != status
+            or current.get("home_score") != new_home
+            or current.get("away_score") != new_away
+        ):
+            supabase.table("matches").update({
+                "home_score": new_home,
+                "away_score": new_away,
+                "status": status
+            }).eq("id", match_id).execute()
+        else:
+            writes_skipped += 1
+
+if writes_skipped:
+    print(f"Skipped {writes_skipped} no-op write(s)")
 
 # Step 6 — generate post-match summaries for newly finished matches
 # Note: refresh_leaderboard() removed — leaderboard is now a live view
