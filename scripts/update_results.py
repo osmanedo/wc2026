@@ -1,6 +1,7 @@
 import os
 import sys
 import requests
+from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
 from supabase import create_client
 from generate_summary import generate_summary
@@ -12,7 +13,38 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
 # Step 2 — create Supabase client (use service key)
+# Step 2 — create Supabase client (use service key)
 supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+# Step 2.5 — live-match gate: exit early if nothing is live or imminent
+LIVE_STATUSES = ["IN_PLAY", "PAUSED", "EXTRA_TIME", "PENALTY_SHOOTOUT"]
+
+now = datetime.now(timezone.utc)
+window_start = (now - timedelta(hours=3)).isoformat()
+window_end = (now + timedelta(hours=3)).isoformat()
+
+live = (
+    supabase.table("matches")
+    .select("id")
+    .in_("status", LIVE_STATUSES)
+    .limit(1)
+    .execute()
+)
+
+imminent = (
+    supabase.table("matches")
+    .select("id")
+    .gte("kickoff_utc", window_start)
+    .lte("kickoff_utc", window_end)
+    .limit(1)
+    .execute()
+)
+
+if not live.data and not imminent.data:
+    print("No live or imminent matches — exiting cleanly")
+    sys.exit(0)
+
+# Step 3 — get matches already marked FINISHED in our DB
 
 # Step 3 — get matches already marked FINISHED in our DB
 already_finished = (
