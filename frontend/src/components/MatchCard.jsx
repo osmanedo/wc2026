@@ -15,6 +15,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
 
   const isFinished = match.status === 'FINISHED'
   const isTimed   = match.status === 'TIMED'
+  const isLive    = ['IN_PLAY', 'PAUSED', 'EXTRA_TIME', 'PENALTY_SHOOTOUT'].includes(match.status)
 
   const kickoffMs  = new Date(match.kickoff_utc).getTime()
   const msLeft     = kickoffMs - now
@@ -24,6 +25,21 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
   // canPick: status must be TIMED and kickoff time must not have passed yet.
   // Client-side lock covering the gap before football-data.org flips to IN_PLAY.
   const canPick = isTimed && msLeft > 0
+
+  // Show live or final score; otherwise show kickoff time. Null guard handles
+  // the brief window where status flips to IN_PLAY before scores are written.
+  const showScore = (isFinished || isLive) && match.home_score != null
+
+  // Short label for the status badge. Group stage only ever hits TIMED/IN_PLAY/
+  // FINISHED — PAUSED/ET/PEN only show up in knockouts (from June 27).
+  const statusLabel =
+    isFinished ? 'FT' :
+    isTimed    ? 'vs' :
+    match.status === 'PAUSED'            ? 'HT'  :
+    match.status === 'EXTRA_TIME'        ? 'ET'  :
+    match.status === 'PENALTY_SHOOTOUT'  ? 'PEN' :
+    isLive     ? 'LIVE' :
+    match.status
 
   // Tick every 30s so the countdown stays fresh
   useEffect(() => {
@@ -108,7 +124,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
         <img className="team-flag" src={match.home_team.flag_url} alt={`${match.home_team.name} flag`} />
         <span className="team-name">{match.home_team.name}</span>
         <div className="match-center">
-          {isFinished ? (
+          {showScore ? (
             <span className="score">{match.home_score} - {match.away_score}</span>
           ) : (
             <span className="kickoff-time">{kickoff}</span>
@@ -116,9 +132,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
             <span className="timezone-label">
               Your time ({Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g, ' ')})
             </span>
-          <span className={`status-badge ${match.status.toLowerCase()}`}>
-            {isFinished ? 'FT' : match.status === 'TIMED' ? 'vs' : match.status}
-          </span>
+          <span className={`status-badge ${match.status.toLowerCase()}`}>{statusLabel}</span>
         </div>
         <span className="team-name right">{match.away_team.name}</span>
         <img className="team-flag" src={match.away_team.flag_url} alt={`${match.away_team.name} flag`} />
