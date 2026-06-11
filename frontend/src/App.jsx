@@ -49,7 +49,7 @@ const TrophyIcon = () => (
 )
 
 function HeaderCountdown() {
-  const target = new Date('2026-06-11T16:00:00Z').getTime()
+  const target = new Date('2026-06-11T19:00:00Z').getTime()
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
