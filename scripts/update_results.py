@@ -59,6 +59,18 @@ current_state = {
 }
 already_finished_ids = {mid for mid, s in current_state.items() if s["status"] == "FINISHED"}
 
+# Step 3.5 — find matches that already have a post-match summary in ai_briefs.
+# Used to skip Claude calls for already-summarised matches AND to auto-retry
+# matches where generate_summary failed in a previous run (the row will still
+# be missing post_match_summary, so this run will pick it up).
+existing_summary_resp = (
+    supabase.table("ai_briefs")
+    .select("match_id")
+    .not_.is_("post_match_summary", "null")
+    .execute()
+)
+matches_with_summaries = {row["match_id"] for row in existing_summary_resp.data}
+
 # Step 4 — call football-data.org matches endpoint
 try:
     response = requests.get(
@@ -165,17 +177,28 @@ for match in results_data["matches"]:
 if writes_skipped:
     print(f"Skipped {writes_skipped} no-op write(s)")
 
-# Step 6 — generate post-match summaries for newly finished matches
+# Step 6 — generate post-match summaries.
+# Fire for every FINISHED match that doesn't yet have a post_match_summary in
+# ai_briefs. Covers both cases:
+#   1. Match transitioned to FINISHED in this run (just-finished)
+#   2. Match finished in a previous run but generate_summary failed silently
+#      (row in ai_briefs is missing the summary, so this run retries it)
 # Note: refresh_leaderboard() removed — leaderboard is now a live view
-for match_id in newly_finished:
+all_finished = already_finished_ids | set(newly_finished)
+needs_summary = all_finished - matches_with_summaries
+
+if needs_summary:
+    print(f"Generating summaries for {len(needs_summary)} match(es)")
+
+for match_id in needs_summary:
     try:
         generate_summary(match_id)
     except Exception as e:
         # generate_summary already retried MAX_RETRIES times — log and move on.
-        # The frontend falls back to pre_match_brief until a later run succeeds.
+        # Next run will pick it up again since the row still has no summary.
         print(f"  ✗ Summary permanently failed for match {match_id}: {e}")
 
 if newly_finished:
-    print(f"\n{len(newly_finished)} new match(es) finished — summaries generated")
-else:
+    print(f"\n{len(newly_finished)} match(es) newly finished this run")
+elif not needs_summary:
     print("No new results")
