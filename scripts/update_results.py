@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 from dotenv import load_dotenv
 from supabase import create_client
@@ -23,12 +24,21 @@ already_finished = (
 already_finished_ids = {row["id"] for row in already_finished.data}
 
 # Step 4 — call football-data.org matches endpoint
-response = requests.get(
-    "https://api.football-data.org/v4/competitions/WC/matches",
-    headers={"X-Auth-Token": FOOTBALL_API_KEY}
-)
+# Step 4 — call football-data.org matches endpoint
+try:
+    response = requests.get(
+        "https://api.football-data.org/v4/competitions/WC/matches",
+        headers={"X-Auth-Token": FOOTBALL_API_KEY},
+        timeout=15
+    )
+    response.raise_for_status()
+    results_data = response.json()
+except requests.exceptions.RequestException as e:
+    status = e.response.status_code if e.response is not None else "no response"
+    print(f"  ✗ football-data.org request failed ({status}): {e}")
+    print("  → exiting cleanly, next poll will retry in 5 minutes")
+    sys.exit(0)
 
-results_data = response.json()
 print(f"Processed {len(results_data['matches'])} matches from football-data.org")
 
 # Step 5 — loop through matches and sync scores + status

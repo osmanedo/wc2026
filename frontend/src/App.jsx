@@ -8,6 +8,7 @@ const ROUND_LABELS = {
   LAST_16: 'Round of 16',
   QUARTER_FINALS: 'Quarter Finals',
   SEMI_FINALS: 'Semi Finals',
+  THIRD_PLACE: 'Third Place',
   FINAL: 'Final',
 }
 import { supabase } from './lib/supabase'
