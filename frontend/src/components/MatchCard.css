@@ -223,3 +223,9 @@
   color: var(--green);
   margin-left: 0.4em;
 }
+
+.match-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}

@@ -18,6 +18,7 @@ import Leaderboard from './components/Leaderboard'
 import GlobalLeaderboard from './components/GlobalLeaderboard'
 import LeaguePanel from './components/LeaguePanel'
 import HowItWorks from './components/HowItWorks'
+import MatchDetail from './components/MatchDetail'
 
 const UsersIcon = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -114,6 +115,7 @@ export default function App() {
   const [filterRound, setFilterRound] = useState('all')
   const [filterGroup, setFilterGroup] = useState('all')
   const [isDeepLinkJoin, setIsDeepLinkJoin] = useState(false)
+  const [selectedMatch, setSelectedMatch] = useState(null)
 
   const copyCode = (code) => {
     navigator.clipboard.writeText(code).then(() => {
@@ -135,6 +137,12 @@ export default function App() {
   )
   const [installPrompt, setInstallPrompt] = useState(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
+
+  // helper: switch view and exit match detail
+  const goToView = (v) => {
+    setSelectedMatch(null)
+    setView(v)
+  }
 
   useEffect(() => {
     if (localStorage.getItem('wc2026_install_dismissed')) return
@@ -196,8 +204,13 @@ export default function App() {
     return groups
   }, {})
 
+  // CRITICAL: filter picks to current user. New RLS policy opens reads of
+  // group members' picks after kickoff — unfiltered select would return
+  // other users' picks and break existingPick lookup in MatchCard.
   const fetchPicks = () => {
+    if (!user) return
     supabase.from("picks").select("*")
+      .eq('user_id', user.id)
       .then(({ data }) => setPicks(data ?? []))
   }
 
@@ -297,7 +310,7 @@ export default function App() {
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
-  }, [view])
+  }, [view, selectedMatch])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -375,6 +388,14 @@ export default function App() {
 
       {/* Views */}
       <main className="main">
+        {selectedMatch ? (
+          <MatchDetail
+            match={selectedMatch}
+            user={user}
+            onBack={() => setSelectedMatch(null)}
+          />
+        ) : (
+        <>
         {view === 'fixtures' && (
           <div>
             {matchesError && (
@@ -448,6 +469,7 @@ export default function App() {
                         onPickSubmitted={fetchPicks}
                         onSignIn={() => setShowAuthModal(true)}
                         showBriefs={showBriefs}
+                        onViewDetail={setSelectedMatch}
                       />
                     ))}
                   </div>
@@ -602,6 +624,8 @@ export default function App() {
       )}
     </div>
   )}
+        </>
+        )}
       </main>
 
       {showAuthModal && (
@@ -626,15 +650,15 @@ export default function App() {
 
       {/* Bottom Nav */}
       <nav className="bottom-nav">
-        <button onClick={() => setView('fixtures')} className={view === 'fixtures' ? 'active' : ''}>
+        <button onClick={() => goToView('fixtures')} className={view === 'fixtures' && !selectedMatch ? 'active' : ''}>
           <span className="nav-icon"><CalendarIcon /></span>
           <span className="nav-label">Fixtures</span>
         </button>
-        <button onClick={() => setView('leaderboard')} className={view === 'leaderboard' ? 'active' : ''}>
+        <button onClick={() => goToView('leaderboard')} className={view === 'leaderboard' && !selectedMatch ? 'active' : ''}>
           <span className="nav-icon"><TrophyIcon /></span>
           <span className="nav-label">Leaderboard</span>
         </button>
-        <button onClick={() => setView('leagues')} className={view === 'leagues' ? 'active' : ''}>
+        <button onClick={() => goToView('leagues')} className={view === 'leagues' && !selectedMatch ? 'active' : ''}>
           <span className="nav-icon"><UsersIcon /></span>
           <span className="nav-label">Leagues</span>
         </button>
