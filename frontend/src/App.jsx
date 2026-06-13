@@ -235,7 +235,8 @@ export default function App() {
       supabase.from("matches").select(`
         *,
         home_team:teams!fk_home_team(name, flag_url),
-        away_team:teams!fk_away_team(name, flag_url)
+        away_team:teams!fk_away_team(name, flag_url),
+        ai_briefs(post_match_summary)
       `).order('kickoff_utc', { ascending: true }).then(({ data, error }) => {
         if (error) setMatchesError('Could not load fixtures. Please refresh.')
         else setMatches(data ?? [])

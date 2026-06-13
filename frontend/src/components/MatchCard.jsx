@@ -27,6 +27,13 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
   // Client-side lock covering the gap before football-data.org flips to IN_PLAY.
   const canPick = isTimed && msLeft > 0
 
+  // Whether a post-match summary has actually been generated yet. The embedded
+  // ai_briefs relation comes back as an array (one row max per the unique
+  // match_id constraint). We only flip the button copy once the summary exists,
+  // so the label never promises a summary the modal can't yet show.
+  const aiBrief = Array.isArray(match.ai_briefs) ? match.ai_briefs[0] : match.ai_briefs
+  const hasSummary = isFinished && !!aiBrief?.post_match_summary
+
   // Show live or final score; otherwise show kickoff time. Null guard handles
   // the brief window where status flips to IN_PLAY before scores are written.
   const showScore = (isFinished || isLive) && match.home_score != null
@@ -186,7 +193,7 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
               setShowBrief(true)
             }}
           >
-            AI Brief & Prediction
+            {hasSummary ? 'AI Match Summary' : 'AI Brief & Prediction'}
           </button>
         )}
       </div>
