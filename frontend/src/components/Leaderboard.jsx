@@ -12,6 +12,13 @@ const TIEBREAK_KEYS = [
   ['accuracy_pct',      n => `${n}% accuracy`],
 ]
 
+// Form-dot colour per result char: E = exact (green), W = correct (amber), L = loss (red)
+function formDotClass(result) {
+  if (result === 'E') return 'exact'
+  if (result === 'W') return 'correct'
+  return 'loss'
+}
+
 function getTiebreakerLabel(entry, prev) {
   if (!prev || prev.total_points !== entry.total_points) return null
   for (const [key, fmt] of TIEBREAK_KEYS) {
@@ -223,7 +230,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
                 {e.last_5_form && (
                   <div className="form-row podium-form">
                     {e.last_5_form.split('').map((r, i) => (
-                      <span key={i} className={`form-dot ${r === 'W' ? 'win' : 'loss'}`} />
+                      <span key={i} className={`form-dot ${formDotClass(r)}`} />
                     ))}
                   </div>
                 )}
@@ -260,7 +267,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
                 {entry.last_5_form && (
                   <div className="form-row">
                     {entry.last_5_form.split('').map((r, i) => (
-                      <span key={i} className={`form-dot ${r === 'W' ? 'win' : 'loss'}`} />
+                      <span key={i} className={`form-dot ${formDotClass(r)}`} />
                     ))}
                   </div>
                 )}

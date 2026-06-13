@@ -11,6 +11,29 @@
   color: #666;
 }
 
+.md-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 7px 14px 7px 11px;
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.md-back:hover {
+  background: var(--gray-100);
+  border-color: var(--green-accent);
+}
+
 .md-title {
   font-family: 'Syne', sans-serif;
   font-size: 22px;
@@ -43,26 +66,9 @@
   color: #555;
 }
 
-.md-league-selector {
+.md-league-tabs {
   margin-bottom: 16px;
-}
-
-.md-label {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: #666;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.md-select {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-  background: #fff;
-  font-family: inherit;
+  margin-top: 16px;
 }
 
 .md-section-title {

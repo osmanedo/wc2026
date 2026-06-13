@@ -1,0 +1,129 @@
+.consensus-bar {
+  padding: 10px 14px;
+  background: #fafafa;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.consensus-bar.tappable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.consensus-bar.tappable:hover {
+  background: #f1f5f1;
+}
+
+.consensus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #4b5563;
+  gap: 8px;
+}
+
+.consensus-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.consensus-stats .dot {
+  color: #cbd5e1;
+}
+
+.consensus-stats .stat.user {
+  font-weight: 600;
+  color: #1a472a;
+}
+
+.consensus-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.consensus-total {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 0.02em;
+}
+
+.consensus-track-wrap {
+  position: relative;
+  padding-bottom: 18px;
+}
+
+.consensus-track {
+  position: relative;
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.consensus-segment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.consensus-segment.home { background: #1a472a; }
+.consensus-segment.draw { background: #94a3b8; }
+.consensus-segment.away { background: #3b82f6; }
+
+.consensus-segment.user {
+  filter: saturate(1.15) brightness(1.05);
+}
+
+/* Marker pointing at the center of the user's segment */
+.consensus-marker-pin {
+  position: absolute;
+  top: -3px;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: #fff;
+  border: 1.5px solid #111827;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.consensus-marker-label {
+  position: absolute;
+  bottom: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #111827;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.consensus-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #d1d5db;
+  color: #1a472a;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.consensus-cta-arrow {
+  transition: transform 0.15s ease;
+}
+
+.consensus-bar.tappable:hover .consensus-cta-arrow {
+  transform: translateX(3px);
+}

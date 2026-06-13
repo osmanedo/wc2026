@@ -244,8 +244,9 @@
   flex-shrink: 0;
 }
 
-.form-dot.win  { background: var(--green); }
-.form-dot.loss { background: #ef4444; }
+.form-dot.exact   { background: var(--green); }  /* exact score */
+.form-dot.correct { background: #f59e0b; }       /* correct result */
+.form-dot.loss    { background: #ef4444; }       /* incorrect */
 
 .power-badges {
   display: flex;

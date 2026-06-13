@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import ConsensusBar from './ConsensusBar'
 import './MatchDetail.css'
 
-export default function MatchDetail({ match, user, onBack }) {
+export default function MatchDetail({ match, user, onBack, userPick }) {
   const [leagues, setLeagues] = useState([])
   const [selectedLeagueId, setSelectedLeagueId] = useState(null)
   const [picks, setPicks] = useState([])
@@ -57,6 +58,10 @@ export default function MatchDetail({ match, user, onBack }) {
       </h1>
       <p className="md-kickoff">{new Date(match.kickoff_utc).toLocaleString()}</p>
 
+      {kickedOff && (
+        <ConsensusBar matchId={match.id} userPick={userPick} />
+      )}
+
       {!kickedOff && (
         <div className="md-notice">
           league picks will appear here once the match has kicked off.
@@ -78,17 +83,16 @@ export default function MatchDetail({ match, user, onBack }) {
       {kickedOff && user && leagues.length > 0 && (
         <>
           {leagues.length > 1 && (
-            <div className="md-league-selector">
-              <label className="md-label">LEAGUE</label>
-              <select
-                value={selectedLeagueId || ''}
-                onChange={(e) => setSelectedLeagueId(e.target.value)}
-                className="md-select"
-              >
-                {leagues.map((lg) => (
-                  <option key={lg.id} value={lg.id}>{lg.name}</option>
-                ))}
-              </select>
+            <div className="league-tabs md-league-tabs">
+              {leagues.map((lg) => (
+                <button
+                  key={lg.id}
+                  className={`league-tab ${selectedLeagueId === lg.id ? 'active' : ''}`}
+                  onClick={() => setSelectedLeagueId(lg.id)}
+                >
+                  {lg.name}
+                </button>
+              ))}
             </div>
           )}
 

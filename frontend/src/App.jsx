@@ -393,6 +393,7 @@ export default function App() {
             match={selectedMatch}
             user={user}
             onBack={() => setSelectedMatch(null)}
+            userPick={picks.find(p => p.match_id === selectedMatch.id)}
           />
         ) : (
         <>

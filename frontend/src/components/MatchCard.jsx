@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import ScorePicker from './ScorePicker'
 import AIBrief from './AIBrief'
+import ConsensusBar from './ConsensusBar'
 import './MatchCard.css'
 
-export default function MatchCard({ match, user, existingPick, onPickSubmitted, onSignIn, showBriefs = true }) {
+export default function MatchCard({ match, user, existingPick, onPickSubmitted, onSignIn, showBriefs = true, onViewDetail }) {
   const [showPicker, setShowPicker] = useState(false)
   const [showBrief, setShowBrief] = useState(false)
   const [now, setNow] = useState(Date.now())
@@ -137,6 +138,14 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
         <span className="team-name right">{match.away_team.name}</span>
         <img className="team-flag" src={match.away_team.flag_url} alt={`${match.away_team.name} flag`} />
       </div>
+
+      {(isLive || isFinished) && (
+        <ConsensusBar
+          matchId={match.id}
+          userPick={existingPick}
+          onClick={() => onViewDetail?.(match)}
+        />
+      )}
 
       <div className="pick-action-row">
         <div className="pick-action-left">
