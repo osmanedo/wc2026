@@ -1,3 +1,4 @@
 {
-    "claudeCode.useTerminal": false
+    "claudeCode.useTerminal": false,
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }
