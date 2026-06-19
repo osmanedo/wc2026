@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const ROUND_ORDER = ['GROUP_STAGE', 'LAST_32', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 'FINAL']
 const ROUND_LABELS = {
@@ -204,6 +204,11 @@ export default function App() {
     return groups
   }, {})
 
+  // Anchor for auto-scroll: first non-finished match's date wrapper
+  const firstUpcomingDateRef = useRef(null)
+  const firstUpcomingMatch = filteredMatches.find(m => m.status !== 'FINISHED')
+  const firstUpcomingDate = firstUpcomingMatch ? toDateLabel(firstUpcomingMatch.kickoff_utc) : null
+
   // CRITICAL: filter picks to current user. New RLS policy opens reads of
   // group members' picks after kickoff — unfiltered select would return
   // other users' picks and break existingPick lookup in MatchCard.
@@ -309,9 +314,28 @@ export default function App() {
   }
 }, [user])
 
+// Scroll-to-top for non-fixtures views and when entering match detail.
+  // Fixtures-list scroll is handled by the effect below.
   useEffect(() => {
+    if (view === 'fixtures' && !selectedMatch) return
     window.scrollTo({ top: 0 })
   }, [view, selectedMatch])
+
+  // On every mount of the fixtures list, scroll to the first non-finished
+  // match's date header. block: 'center' keeps the previous day peeking
+  // above for context. rAF defers until after paint so the target exists.
+  useEffect(() => {
+    if (view !== 'fixtures' || selectedMatch) return
+    if (loadingMatches) return
+    const id = requestAnimationFrame(() => {
+      if (firstUpcomingDateRef.current) {
+        firstUpcomingDateRef.current.scrollIntoView({ block: 'nearest' })
+      } else {
+        window.scrollTo({ top: 0 })
+      }
+    })
+    return () => cancelAnimationFrame(id)
+  }, [view, selectedMatch, loadingMatches])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -462,7 +486,7 @@ export default function App() {
               <p className="no-results">No fixtures match your filters.</p>
             ) : (
               Object.entries(matchesByDate).map(([date, dayMatches]) => (
-                <div key={date}>
+                <div key={date} ref={date === firstUpcomingDate ? firstUpcomingDateRef : null}>
                   <h3 className='date-header'>{date}</h3>
                   <div className="match-grid">
                     {dayMatches.map(match => (
