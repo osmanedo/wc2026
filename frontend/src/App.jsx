@@ -340,7 +340,7 @@ export default function App() {
     if (loadingMatches) return
     const id = requestAnimationFrame(() => {
       if (firstUpcomingDateRef.current) {
-        firstUpcomingDateRef.current.scrollIntoView({ block: 'nearest' })
+        firstUpcomingDateRef.current.scrollIntoView({ block: 'center' })
       } else {
         window.scrollTo({ top: 0 })
       }
