@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+import KofiButton from './KofiButton'
 import './Leaderboard.css'
 
 // Order matches the tiebreak chain applied to the leaderboard.
@@ -151,7 +152,10 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
   if (loading) {
     return (
       <div className="leaderboard">
-        <h2 className="leaderboard-title">Leaderboard</h2>
+        <div className="leaderboard-header">
+          <h2 className="leaderboard-title">Leaderboard</h2>
+          <KofiButton username="ozeduardoperez" />
+        </div>
         {socialProof}
         {Array.from({ length: lastEntryCount.current }).map((_, i) => (
           <div key={i} className="skeleton-row" />
@@ -163,7 +167,10 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
   if (error) {
     return (
       <div className="leaderboard">
-        <h2 className="leaderboard-title">Leaderboard</h2>
+        <div className="leaderboard-header">
+          <h2 className="leaderboard-title">Leaderboard</h2>
+          <KofiButton username="ozeduardoperez" />
+        </div>
         {socialProof}
         <div className="error-banner">{error}</div>
       </div>
@@ -173,7 +180,10 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
   if (entries.length === 0) {
     return (
       <div className="leaderboard">
-        <h2 className="leaderboard-title">Leaderboard</h2>
+        <div className="leaderboard-header">
+          <h2 className="leaderboard-title">Leaderboard</h2>
+          <KofiButton username="ozeduardoperez" />
+        </div>
         {socialProof}
         <div className="empty-state">
           <div className="empty-state-icon">
@@ -204,7 +214,10 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
 
   return (
     <div className="leaderboard">
-      <h2 className="leaderboard-title">Leaderboard</h2>
+      <div className="leaderboard-header">
+        <h2 className="leaderboard-title">Leaderboard</h2>
+        <KofiButton username="ozeduardoperez" />
+      </div>
       {socialProof}
       <p className="leaderboard-tiebreak-note">
         Tied on points? See{' '}

@@ -11,14 +11,15 @@ function validatePassword(pw) {
   return errs
 }
 
-export default function Auth({ onSuccess } = {}) {
-  const [mode, setMode] = useState('signin')
+export default function Auth({ onSuccess, initialMode } = {}) {
+  const [mode, setMode] = useState(initialMode || 'signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [errors, setErrors] = useState({})
   const [serverError, setServerError] = useState('')
+  const [serverMessage, setServerMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleGoogleLogin = async () => {
@@ -32,6 +33,7 @@ export default function Auth({ onSuccess } = {}) {
     setMode(next)
     setErrors({})
     setServerError('')
+    setServerMessage('')
     setEmail('')
     setPassword('')
     setConfirmPassword('')
@@ -78,6 +80,118 @@ export default function Auth({ onSuccess } = {}) {
     } else {
       onSuccess?.()
     }
+  }
+
+  const handleForgotPassword = async () => {
+    const fieldErrors = {}
+    if (!email) fieldErrors.email = 'Required'
+    if (Object.keys(fieldErrors).length) { setErrors(fieldErrors); return }
+
+    setLoading(true)
+    setServerError('')
+    setServerMessage('')
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin
+    })
+    setLoading(false)
+    if (error) {
+      setServerError(error.message)
+    } else {
+      setServerMessage('Check your email for a password reset link.')
+    }
+  }
+
+  const handleResetPassword = async () => {
+    const pwErrors = validatePassword(password)
+    const fieldErrors = {}
+    if (Object.keys(pwErrors).length) fieldErrors.password = pwErrors
+    if (password !== confirmPassword) fieldErrors.confirmPassword = 'Passwords do not match'
+    if (Object.keys(fieldErrors).length) { setErrors(fieldErrors); return }
+
+    setLoading(true)
+    setServerError('')
+    setServerMessage('')
+    const { error } = await supabase.auth.updateUser({ password })
+    setLoading(false)
+    if (error) {
+      setServerError(error.message)
+    } else {
+      setServerMessage('Password updated successfully.')
+      setTimeout(() => onSuccess?.(), 1500)
+    }
+  }
+
+  // Reset-password mode: user just clicked the email link
+  if (mode === 'resetpassword') {
+    return (
+      <div className="auth-card">
+        <h3 className="auth-heading">Set a new password</h3>
+        <form onSubmit={e => { e.preventDefault(); handleResetPassword() }}>
+          <div className="auth-field">
+            <input
+              className="auth-input"
+              type="password"
+              placeholder="New password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+            {errors.password && (
+              <ul className="auth-pw-errors">
+                {Object.values(errors.password).map(e => <li key={e}>{e}</li>)}
+              </ul>
+            )}
+          </div>
+          <div className="auth-field">
+            <input
+              className="auth-input"
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+            {errors.confirmPassword && <span className="auth-error">{errors.confirmPassword}</span>}
+          </div>
+          {serverError && <p className="auth-server-error">{serverError}</p>}
+          {serverMessage && <p className="auth-success-message">{serverMessage}</p>}
+          <button className="auth-submit-btn" type="submit" disabled={loading}>
+            {loading ? '…' : 'Update Password'}
+          </button>
+        </form>
+      </div>
+    )
+  }
+
+  // Forgot-password mode: enter email to receive reset link
+  if (mode === 'forgot') {
+    return (
+      <div className="auth-card">
+        <h3 className="auth-heading">Reset your password</h3>
+        <p className="auth-subtext">Enter your email and we'll send you a reset link.</p>
+        <form onSubmit={e => { e.preventDefault(); handleForgotPassword() }}>
+          <div className="auth-field">
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              autoComplete="email"
+            />
+            {errors.email && <span className="auth-error">{errors.email}</span>}
+          </div>
+          {serverError && <p className="auth-server-error">{serverError}</p>}
+          {serverMessage && <p className="auth-success-message">{serverMessage}</p>}
+          <button className="auth-submit-btn" type="submit" disabled={loading}>
+            {loading ? '…' : 'Send Reset Link'}
+          </button>
+        </form>
+        <p className="auth-toggle">
+          <button className="auth-link" onClick={() => switchMode('signin')}>Back to sign in</button>
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -145,6 +259,12 @@ export default function Auth({ onSuccess } = {}) {
             {loading ? '…' : mode === 'signup' ? 'Create Account' : 'Sign In'}
           </button>
         </form>
+
+      {mode === 'signin' && (
+        <p className="auth-forgot">
+          <button className="auth-link" onClick={() => switchMode('forgot')}>Forgot password?</button>
+        </p>
+      )}
 
       <p className="auth-toggle">
           {mode === 'signin' ? (

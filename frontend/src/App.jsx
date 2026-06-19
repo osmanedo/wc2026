@@ -116,7 +116,7 @@ export default function App() {
   const [filterGroup, setFilterGroup] = useState('all')
   const [isDeepLinkJoin, setIsDeepLinkJoin] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState(null)
-
+  
   const copyCode = (code) => {
     navigator.clipboard.writeText(code).then(() => {
       setCopiedCode(code)
@@ -124,6 +124,7 @@ export default function App() {
     })
   }
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
   const [showLeaguePanel, setShowLeaguePanel] = useState(false)
   const [showLeagueSignIn, setShowLeagueSignIn] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(
@@ -230,11 +231,21 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    // Catch password recovery redirect from Supabase email link
+    const hash = window.location.hash
+    if (hash && hash.includes('type=recovery')) {
+      setPasswordRecovery(true)
+      setShowAuthModal(true)
+    }
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      if (event === 'PASSWORD_RECOVERY') {
+        setPasswordRecovery(true)
+        setShowAuthModal(true)
+      }
     })
     const fetchMatches = () =>
       supabase.from("matches").select(`
@@ -658,7 +669,13 @@ export default function App() {
         <div className="auth-modal-overlay" onClick={() => setShowAuthModal(false)}>
           <div className="auth-modal" onClick={e => e.stopPropagation()}>
             <button className="auth-modal-close" onClick={() => setShowAuthModal(false)}>✕</button>
-            <Auth onSuccess={() => setShowAuthModal(false)} />
+            <Auth
+              initialMode={passwordRecovery ? 'resetpassword' : undefined}
+              onSuccess={() => {
+                setShowAuthModal(false)
+                setPasswordRecovery(false)
+            }}
+            />
           </div>
         </div>
       )}

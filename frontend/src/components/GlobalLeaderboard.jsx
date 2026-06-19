@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import './Leaderboard.css'
 import './GlobalLeaderboard.css'
+import KofiButton from './KofiButton'
 
 const TOP_N = 10
 const NEIGHBORS = 3
@@ -256,7 +257,10 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
 
   return (
     <div className="leaderboard">
-      <h2 className="leaderboard-title">Leaderboard</h2>
+      <div className="leaderboard-header">
+        <h2 className="leaderboard-title">Leaderboard</h2>
+        <KofiButton username="ozeduardoperez" />
+      </div>
       {socialProof}
       {mode === 'neighborhood' ? renderNeighborhood() : renderFull()}
     </div>
