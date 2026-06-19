@@ -129,7 +129,13 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
   return (
     <div className={`match-card${isFinished ? ' finished' : ''}`}>
       <div className="match-teams">
-        <img className="team-flag" src={match.home_team.flag_url} alt={`${match.home_team.name} flag`} />
+        <img
+          className="team-flag"
+          src={match.home_team.flag_url}
+          alt={`${match.home_team.name} flag`}
+          width="40"
+          height="30"
+        />
         <span className="team-name">{match.home_team.name}</span>
         <div className="match-center">
           {showScore ? (
@@ -143,15 +149,23 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
           <span className={`status-badge ${match.status.toLowerCase()}`}>{statusLabel}</span>
         </div>
         <span className="team-name right">{match.away_team.name}</span>
-        <img className="team-flag" src={match.away_team.flag_url} alt={`${match.away_team.name} flag`} />
+        <img
+          className="team-flag"
+          src={match.away_team.flag_url}
+          alt={`${match.away_team.name} flag`}
+          width="40"
+          height="30"
+        />
       </div>
 
       {(isLive || isFinished) && (
-        <ConsensusBar
-          matchId={match.id}
-          userPick={existingPick}
-          onClick={() => onViewDetail?.(match)}
-        />
+        <div style={{ minHeight: '100px' }}>
+          <ConsensusBar
+            matchId={match.id}
+            userPick={existingPick}
+            onClick={() => onViewDetail?.(match)}
+          />
+        </div>
       )}
 
       <div className="pick-action-row">

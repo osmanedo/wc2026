@@ -325,7 +325,7 @@ export default function App() {
   }
 }, [user])
 
-// Scroll-to-top for non-fixtures views and when entering match detail.
+  // Scroll-to-top for non-fixtures views and when entering match detail.
   // Fixtures-list scroll is handled by the effect below.
   useEffect(() => {
     if (view === 'fixtures' && !selectedMatch) return
@@ -333,19 +333,32 @@ export default function App() {
   }, [view, selectedMatch])
 
   // On every mount of the fixtures list, scroll to the first non-finished
-  // match's date header. block: 'center' keeps the previous day peeking
-  // above for context. rAF defers until after paint so the target exists.
+  // match's date header. Dual-pass scroll: rAF lands the immediate position,
+  // then two timed re-scrolls correct for layout shift from late-loading
+  // flag images, pick distribution bars and AI briefs. Critical for iPhone
+  // Safari which decodes images slower than desktop — without the timed
+  // re-scrolls the target drifts down out of view after the initial scroll.
   useEffect(() => {
     if (view !== 'fixtures' || selectedMatch) return
     if (loadingMatches) return
-    const id = requestAnimationFrame(() => {
+
+    const performScroll = () => {
       if (firstUpcomingDateRef.current) {
-        firstUpcomingDateRef.current.scrollIntoView({ block: 'start' })
+        firstUpcomingDateRef.current.scrollIntoView({ block: 'center' })
       } else {
         window.scrollTo({ top: 0 })
       }
-    })
-    return () => cancelAnimationFrame(id)
+    }
+
+    const rafId = requestAnimationFrame(performScroll)
+    const t1 = setTimeout(performScroll, 300)
+    const t2 = setTimeout(performScroll, 800)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      clearTimeout(t1)
+      clearTimeout(t2)
+    }
   }, [view, selectedMatch, loadingMatches])
 
   const handleLogout = async () => {
