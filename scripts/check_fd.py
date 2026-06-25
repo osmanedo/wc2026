@@ -1,7 +1,10 @@
 """Quick diagnostic — what does football-data.org actually say right now?"""
 import os
 import json
-import requests
+try:
+    import requests
+except ImportError:
+    raise SystemExit("the 'requests' package is required — install it with: pip install requests")
 from dotenv import load_dotenv
 
 load_dotenv()

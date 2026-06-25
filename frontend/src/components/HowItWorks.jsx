@@ -34,6 +34,45 @@ export default function HowItWorks({ onClose }) {
             </div>
           </div>
 
+          <div className="hiw-section-label hiw-section-label-new">
+            Knockout rounds
+            <span className="hiw-new-badge">New</span>
+          </div>
+          <div className="hiw-knockout-highlight">
+          <p className="hiw-intro">
+            Scores are based on the result at the end of extra time. Penalty shootout goals don't count toward the scoreline.
+          </p>
+          <div className="hiw-points-table hiw-points-table-wide">
+            <div className="hiw-points-row hiw-points-row-wide hiw-points-head">
+              <span className="hiw-points-desc">Outcome</span>
+              <span className="hiw-points-val">Group</span>
+              <span className="hiw-points-val">KO (×2)</span>
+              <span className="hiw-points-val">Final (×3)</span>
+            </div>
+            <div className="hiw-points-row hiw-points-row-wide">
+              <span className="hiw-points-desc">Correct result</span>
+              <span className="hiw-points-val">2</span>
+              <span className="hiw-points-val">4</span>
+              <span className="hiw-points-val">6</span>
+            </div>
+            <div className="hiw-points-row hiw-points-row-wide">
+              <span className="hiw-points-desc">Exact score</span>
+              <span className="hiw-points-val">5</span>
+              <span className="hiw-points-val">10</span>
+              <span className="hiw-points-val">15</span>
+            </div>
+            <div className="hiw-points-row hiw-points-row-wide">
+              <span className="hiw-points-desc">Advancement bonus</span>
+              <span className="hiw-points-val">–</span>
+              <span className="hiw-points-val">2</span>
+              <span className="hiw-points-val">3</span>
+            </div>
+          </div>
+          <p className="hiw-intro">
+            About the advancement bonus: if you predict a winning scoreline, your advancer is implied. If you predict a draw, you'll be asked to pick who wins on penalties. Correctly picking who advances earns the bonus.
+          </p>
+          </div>
+
           <div className="hiw-section-label">Tiebreakers (in order)</div>
           <ol className="hiw-tiebreak-list">
             <li>Most exact-score predictions</li>

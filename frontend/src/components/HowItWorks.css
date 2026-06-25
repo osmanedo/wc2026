@@ -59,6 +59,61 @@
   color: #d97706;
 }
 
+/* New section highlight (knockout rounds update) */
+.hiw-section-label-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hiw-new-badge {
+  font-family: 'Syne', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: #d97706;
+  border-radius: 999px;
+  padding: 2px 7px;
+  line-height: 1.4;
+}
+
+.hiw-knockout-highlight {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #fffbf3;
+  border: 1px solid #f3d9a8;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+/* Wide points table (knockout rounds) */
+.hiw-points-row-wide {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.hiw-points-row-wide .hiw-points-val {
+  text-align: right;
+}
+
+.hiw-points-row.hiw-points-head {
+  background: #f7f7f2;
+}
+
+.hiw-points-head .hiw-points-desc,
+.hiw-points-head .hiw-points-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1a472a;
+}
+
 /* Tips list */
 .hiw-tips {
   list-style: none;

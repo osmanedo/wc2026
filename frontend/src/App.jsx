@@ -128,7 +128,7 @@ export default function App() {
   const [showLeaguePanel, setShowLeaguePanel] = useState(false)
   const [showLeagueSignIn, setShowLeagueSignIn] = useState(false)
   const [showHowItWorks, setShowHowItWorks] = useState(
-  () => !localStorage.getItem('wc2026_welcomed')
+  () => !localStorage.getItem('wc2026_welcomed_v2')
   && !sessionStorage.getItem('pendingJoinCode')
   && !new URLSearchParams(window.location.search).get('join')
   )
@@ -695,7 +695,7 @@ export default function App() {
 
       {showHowItWorks && (
         <HowItWorks onClose={() => {
-          localStorage.setItem('wc2026_welcomed', '1')
+          localStorage.setItem('wc2026_welcomed_v2', '1')
           setShowHowItWorks(false)
         }} />
       )}
