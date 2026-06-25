@@ -14,7 +14,7 @@ export default function HowItWorks({ onClose }) {
             Predict the score for every World Cup match and compete with your mates.
           </p>
 
-          <div className="hiw-section-label">Points table</div>
+          <div className="hiw-section-label">Group stage</div>
           <div className="hiw-points-table">
             <div className="hiw-points-row">
               <span className="hiw-points-desc">Correct result (W / D / L)</span>
@@ -60,8 +60,12 @@ export default function HowItWorks({ onClose }) {
               <span className="hiw-points-val">3</span>
             </div>
           </div>
-          <p className="hiw-intro">
-            About the advancement bonus: if you predict a winning scoreline, your advancer is implied. If you predict a draw, you'll be asked to pick who wins on penalties. Correctly picking who advances earns the bonus.
+          <ul className="hiw-tips hiw-advancement-bonus">
+            <li>Predict a winning score → your advancer is automatic</li>
+            <li>Predict a draw → pick who wins on penalties to earn the bonus</li>
+          </ul>
+          <p className="hiw-example">
+            e.g. Exact score + correct advancer in a knockout match = 10 + 2 = 12 pts
           </p>
           </div>
 

@@ -85,6 +85,14 @@
   padding: 14px;
 }
 
+.hiw-example {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.4;
+  color: #8a8a82;
+}
+
 /* Wide points table (knockout rounds) */
 .hiw-points-row-wide {
   display: grid;
