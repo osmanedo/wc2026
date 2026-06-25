@@ -24,14 +24,6 @@ export default function HowItWorks({ onClose }) {
               <span className="hiw-points-desc">Exact score</span>
               <span className="hiw-points-val">5 pts</span>
             </div>
-            <div className="hiw-points-row multiplier">
-              <span className="hiw-points-desc">Knockout rounds</span>
-              <span className="hiw-points-val">×2</span>
-            </div>
-            <div className="hiw-points-row multiplier">
-              <span className="hiw-points-desc">Final</span>
-              <span className="hiw-points-val">×3</span>
-            </div>
           </div>
 
           <div className="hiw-section-label hiw-section-label-new">

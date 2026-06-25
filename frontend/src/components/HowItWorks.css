@@ -55,10 +55,6 @@
   color: #1a472a;
 }
 
-.hiw-points-row.multiplier .hiw-points-val {
-  color: #d97706;
-}
-
 /* New section highlight (knockout rounds update) */
 .hiw-section-label-new {
   display: flex;
