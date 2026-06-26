@@ -2,7 +2,7 @@ name: Update Match Results
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # every 5min, 24/7 — script self-gates on live/imminent matches
+    - cron: '*/5 * * * *'   # every 2min, 24/7 — script self-gates on live/imminent matches
   workflow_dispatch:          # allows manual trigger from GitHub
 
 jobs:
