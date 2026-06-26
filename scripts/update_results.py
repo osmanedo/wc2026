@@ -5,7 +5,8 @@ from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
 from supabase import create_client
 from generate_summary import generate_summary
-from supabase import create_client, ClientOptions
+from supabase import create_client
+from httpx import Timeout
 
 # Step 1 — load .env
 load_dotenv()
@@ -14,7 +15,8 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 
 # Step 2 — create Supabase client (use service key)
-supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY, options=ClientOptions(postgrest_client_timeout=30))
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+supabase.postgrest.session.timeout = Timeout(30.0)
 
 # Step 2.5 — live-match gate: exit early if nothing is live or imminent
 LIVE_STATUSES = ["IN_PLAY", "PAUSED", "EXTRA_TIME", "PENALTY_SHOOTOUT"]
