@@ -101,15 +101,25 @@ export default function MatchDetail({ match, user, onBack, userPick }) {
           </h2>
 
           <div className="md-picks-list">
-            {picks.map((p) => (
-              <div key={p.user_id} className="md-pick-row">
-                <span className="md-name">{p.display_name}</span>
-                <span className="md-score">{p.pick_home}–{p.pick_away}</span>
-                <span className="md-points">
-                  {p.points_earned != null ? `${p.points_earned} pts` : '—'}
-                </span>
-              </div>
-            ))}
+            {picks.map((p) => {
+              const advancer =
+                p.pick_winner === 'HOME_TEAM' ? match.home_team?.name :
+                p.pick_winner === 'AWAY_TEAM' ? match.away_team?.name : null
+              return (
+                <div key={p.user_id} className="md-pick-row">
+                  <div className="md-name-cell">
+                    <span className="md-name">{p.display_name}</span>
+                    {advancer && (
+                      <span className="md-advancer">→ {advancer} to advance</span>
+                    )}
+                  </div>
+                  <span className="md-score">{p.pick_home}–{p.pick_away}</span>
+                  <span className="md-points">
+                    {p.points_earned != null ? `${p.points_earned} pts` : '—'}
+                  </span>
+                </div>
+              )
+            })}
             {picks.length === 0 && (
               <div className="md-empty">
                 no picks from this league for this match.

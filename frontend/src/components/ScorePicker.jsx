@@ -20,18 +20,15 @@ export default function ScorePicker({ match, user, existingPick, onPickSubmitted
   const isDraw       = homeScore === awayScore
   const showAdvancer = isKnockout && isDraw
 
-  // A non-draw score implies the advancer from the score itself, so any
-  // explicitly nominated winner is cleared whenever the pick stops being a draw.
-  const updateHome = (value) => {
-    const next = Math.max(0, value)
-    setHomeScore(next)
-    if (next !== awayScore) setPickWinner(null)
-  }
-  const updateAway = (value) => {
-    const next = Math.max(0, value)
-    setAwayScore(next)
-    if (next !== homeScore) setPickWinner(null)
-  }
+  // A non-draw score implies the advancer from the score itself, so the
+  // nominated winner is ignored on submit (written as NULL) when it's not a
+  // draw. We deliberately do NOT clear pickWinner here: bumping the score off a
+  // draw and back used to silently wipe an intentional selection.
+  const updateHome = (value) => setHomeScore(Math.max(0, value))
+  const updateAway = (value) => setAwayScore(Math.max(0, value))
+
+  // Knockout draws must nominate who advances before the pick can be submitted.
+  const advancerMissing = showAdvancer && !pickWinner
 
   const showToast = (msg) => {
     setToast(msg)
@@ -39,6 +36,10 @@ export default function ScorePicker({ match, user, existingPick, onPickSubmitted
   }
 
   const handleSubmit = async () => {
+    if (advancerMissing) {
+      showToast('Pick who advances before submitting.')
+      return
+    }
     setSubmitting(true)
     const { error } = await supabase.from("picks").upsert({
       user_id: user.id,
@@ -57,8 +58,8 @@ export default function ScorePicker({ match, user, existingPick, onPickSubmitted
     }
   }
 
-  // Button label adapts to context: edit vs new, and signals when the advancer
-  // selection is still missing (soft prompt, doesn't block submission).
+  // Button label adapts to context: edit vs new. Submission is blocked
+  // separately when a knockout draw is missing its advancer (see advancerMissing).
   const submitLabel = submitting
     ? 'Submitting…'
     : existingPick
@@ -124,12 +125,16 @@ export default function ScorePicker({ match, user, existingPick, onPickSubmitted
             </div>
             {!pickWinner && (
               <p className="advancer-missing-hint">
-                Tip: pick who advances to be eligible for the bonus point.
+                Pick who advances to submit your draw prediction.
               </p>
             )}
           </div>
         )}
-        <button className="submit-btn" onClick={handleSubmit} disabled={submitting}>
+        <button
+          className="submit-btn"
+          onClick={handleSubmit}
+          disabled={submitting || advancerMissing}
+        >
           {submitLabel}
         </button>
         {toast && <div className="toast">{toast}</div>}
