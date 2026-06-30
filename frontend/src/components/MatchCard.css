@@ -77,6 +77,12 @@
   color: var(--gray-900);
 }
 
+.penalty-result {
+  font-size: 11px;
+  color: var(--gray-400);
+  white-space: nowrap;
+}
+
 .status-badge {
   font-size: 10px;
   font-weight: 600;

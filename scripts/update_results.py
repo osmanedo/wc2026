@@ -49,7 +49,7 @@ if not live.data and not imminent.data:
 # Step 3 — load current state for all matches (used for change detection)
 current_state_resp = (
     supabase.table("matches")
-    .select("id, status, home_score, away_score")
+    .select("id, status, home_score, away_score, home_penalties, away_penalties")
     .execute()
 )
 current_state = {
@@ -57,6 +57,8 @@ current_state = {
         "status": row["status"],
         "home_score": row["home_score"],
         "away_score": row["away_score"],
+        "home_penalties": row["home_penalties"],
+        "away_penalties": row["away_penalties"],
     }
     for row in current_state_resp.data
 }
@@ -102,6 +104,9 @@ for match in results_data["matches"]:
     score  = match["score"]  # full score object
     match_id = match["id"]
     current = current_state.get(match_id, {})
+    if match_id in already_finished_ids and status != "FINISHED":
+        writes_skipped += 1
+        continue
 
     if status == "FINISHED":
         duration = score["duration"]
@@ -119,18 +124,29 @@ for match in results_data["matches"]:
             home_score = regular["home"] + extra["home"]
             away_score = regular["away"] + extra["away"]
 
+        # Extract penalty scores if the match went to a shootout
+        home_penalties = None
+        away_penalties = None
+        if duration == "PENALTY_SHOOTOUT":
+            home_penalties = score["penalties"]["home"]
+            away_penalties = score["penalties"]["away"]
+
         # Only write if status or score changed — catches post-match corrections
         # from football-data.org without re-pushing unchanged rows every poll
         if (
             current.get("status") != status
             or current.get("home_score") != home_score
             or current.get("away_score") != away_score
+            or current.get("home_penalties") != home_penalties
+            or current.get("away_penalties") != away_penalties
         ):
             supabase.table("matches").update({
                 "home_score": home_score,
                 "away_score": away_score,
                 "winner": score["winner"],  # HOME_TEAM, AWAY_TEAM, or DRAW
-                "status": status
+                "status": status,
+                "home_penalties": home_penalties,
+                "away_penalties": away_penalties,
             }).eq("id", match_id).execute()
         else:
             writes_skipped += 1

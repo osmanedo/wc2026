@@ -1,0 +1,20 @@
+import requests
+import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+API_KEY = os.getenv("FOOTBALL_DATA_API_KEY")
+
+r = requests.get(
+    "https://api.football-data.org/v4/matches/537418",
+    headers={"X-Auth-Token": API_KEY},
+    timeout=15
+)
+r.raise_for_status()
+match = r.json()
+
+print(f"Status:   {match['status']}")
+print(f"Duration: {match['score']['duration']}")
+print(f"\nFull score object:")
+print(json.dumps(match["score"], indent=2))
