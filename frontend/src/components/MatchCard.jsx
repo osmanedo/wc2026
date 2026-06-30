@@ -38,12 +38,9 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
   // the brief window where status flips to IN_PLAY before scores are written.
   const showScore = (isFinished || isLive) && match.home_score != null
 
-  // Penalty shootout result line. Both columns are only populated when a match
-  // was decided on penalties; the winning side is whichever count is higher.
+  // Penalty shootout result. Both columns are only populated when a match was
+  // decided on penalties; the side with the higher count is highlighted as the winner.
   const decidedOnPenalties = match.home_penalties != null && match.away_penalties != null
-  const penaltyResult = decidedOnPenalties
-    ? `${match.home_penalties > match.away_penalties ? match.home_team.name : match.away_team.name} won ${Math.max(match.home_penalties, match.away_penalties)}-${Math.min(match.home_penalties, match.away_penalties)} on penalties`
-    : null
 
   // Short label for the status badge. Group stage only ever hits TIMED/IN_PLAY/
   // FINISHED — PAUSED/ET/PEN only show up in knockouts (from June 27).
@@ -150,8 +147,13 @@ export default function MatchCard({ match, user, existingPick, onPickSubmitted, 
           ) : (
             <span className="kickoff-time">{kickoff}</span>
           )}
-          {showScore && penaltyResult && (
-            <span className="penalty-result">{penaltyResult}</span>
+          {showScore && decidedOnPenalties && (
+            <span className="penalty-result">
+              <span className={match.home_penalties > match.away_penalties ? 'pen-winner' : ''}>{match.home_penalties}</span>
+              {' - '}
+              <span className={match.away_penalties > match.home_penalties ? 'pen-winner' : ''}>{match.away_penalties}</span>
+              <span className="pen-label"> pens</span>
+            </span>
           )}
             <span className="timezone-label">
               Your time ({Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g, ' ')})

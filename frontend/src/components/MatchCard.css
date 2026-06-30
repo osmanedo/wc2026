@@ -78,9 +78,22 @@
 }
 
 .penalty-result {
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--gray-400);
   white-space: nowrap;
+}
+
+.penalty-result .pen-winner {
+  color: var(--green-accent);
+  font-weight: 800;
+}
+
+.penalty-result .pen-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .status-badge {
