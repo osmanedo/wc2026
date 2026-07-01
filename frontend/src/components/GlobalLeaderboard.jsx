@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import './Leaderboard.css'
 import './GlobalLeaderboard.css'
 import KofiButton from './KofiButton'
+import LeaderboardFixNotice from './LeaderboardFixNotice'
 
 const TOP_N = 10
 const NEIGHBORS = 3
@@ -257,6 +258,7 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
 
   return (
     <div className="leaderboard">
+      <LeaderboardFixNotice />
       <div className="leaderboard-header">
         <h2 className="leaderboard-title">Leaderboard</h2>
         <KofiButton username="ozeduardoperez" />

@@ -1,0 +1,72 @@
+/* ── Overlay backdrop ── */
+.lfn-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: lfn-fade-in 0.15s ease-out;
+}
+
+/* ── Modal container ── */
+.lfn-modal {
+  position: relative;
+  background: var(--white);
+  border-radius: var(--radius, 12px);
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  padding: 24px 24px 20px;
+  animation: lfn-slide-up 0.2s ease-out;
+}
+
+/* ── Heading ── */
+.lfn-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gray-900, #111);
+  margin: 0 0 12px;
+}
+
+/* ── Body ── */
+.lfn-body {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gray-500);
+  margin: 0 0 20px;
+}
+
+/* ── Dismiss button ── */
+.lfn-button {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-500);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lfn-button:hover {
+  border-color: var(--gray-300);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Animations ── */
+@keyframes lfn-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes lfn-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
