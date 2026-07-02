@@ -23,8 +23,9 @@ response = requests.get(
 existing_teams = supabase.table("teams").select("id").execute()
 existing_ids = {row["id"] for row in existing_teams.data}
 
-
-# Step 4 — handle null values - games not played yet
+# Step 4 — seed fixtures only. Scores and status-driven score fields are owned
+# by update_results.py; this script must NOT write home_score / away_score,
+# to avoid overwriting end-of-ET scores with penalty-inclusive fullTime values.
 match_data = response.json()
 
 for match in match_data["matches"]:
@@ -47,8 +48,8 @@ for match in match_data["matches"]:
         "away_team_id": match["awayTeam"]["id"],
         "kickoff_utc": match["utcDate"],
         "stage": match["stage"],
-        "home_score": match["score"]["fullTime"]["home"],
-        "away_score": match["score"]["fullTime"]["away"],
         "status": match["status"],
         "group_name": match["group"],
     }, on_conflict="id").execute()
+
+    print(f"Seeded: {match['homeTeam']['name']} vs {match['awayTeam']['name']}")
