@@ -1,0 +1,12 @@
+import requests, json, os
+from dotenv import load_dotenv
+load_dotenv()
+API_KEY = os.getenv("FOOTBALL_DATA_API_KEY")
+
+for mid in [537415, 537418]:
+    r = requests.get(f"https://api.football-data.org/v4/matches/{mid}",
+                     headers={"X-Auth-Token": API_KEY}, timeout=15)
+    s = r.json()["score"]
+    print(f"Match {mid}: duration={s['duration']}, "
+          f"fullTime={s['fullTime']}, regularTime={s['regularTime']}, "
+          f"extraTime={s['extraTime']}, penalties={s['penalties']}")

@@ -63,6 +63,7 @@ export default function HowItWorks({ onClose }) {
           <ul className="hiw-tips hiw-advancement-bonus">
             <li>Predict a winning score → your advancer is automatic</li>
             <li>Predict a draw → pick who wins on penalties to earn the bonus</li>
+            <li>Advancement bonus is added once the match is Finished</li>
           </ul>
           <p className="hiw-example">
             e.g. Exact score + correct advancer in a knockout match = 10 + 2 = 12 pts

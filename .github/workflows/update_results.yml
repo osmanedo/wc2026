@@ -5,6 +5,10 @@ on:
     - cron: '*/5 * * * *'   # every 2min, 24/7 — script self-gates on live/imminent matches
   workflow_dispatch:          # allows manual trigger from GitHub
 
+concurrency:
+  group: update-results
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
