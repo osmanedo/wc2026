@@ -5,13 +5,9 @@ import './Leaderboard.css'
 
 // Order matches the tiebreak chain applied to the leaderboard.
 // First entry that differs from the player above is what broke the tie.
-// fmt receives (value, entry) — "correct" is shown exclusive of exact scores
-// to match the stats line and the form dots. Because exact_scores is compared
-// earlier in the chain, exact counts are equal by the time correct breaks the
-// tie, so the exclusive number still reflects the actual differing stat.
 const TIEBREAK_KEYS = [
   ['exact_scores',      n => `${n} exact`],
-  ['correct_results',   (n, e) => `${Math.max(e.correct_results - e.exact_scores, 0)} correct`],
+  ['correct_results',   n => `${n} correct`],
   ['best_single_match', n => `${n} best match`],
   ['current_streak',    n => `${n}-match streak`],
   ['accuracy_pct',      n => `${n}% accuracy`],
@@ -27,7 +23,7 @@ function formDotClass(result) {
 function getTiebreakerLabel(entry, prev) {
   if (!prev || prev.total_points !== entry.total_points) return null
   for (const [key, fmt] of TIEBREAK_KEYS) {
-    if (prev[key] !== entry[key]) return fmt(entry[key], entry)
+    if (prev[key] !== entry[key]) return fmt(entry[key])
   }
   return 'alphabetical'
 }
@@ -255,7 +251,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
                   <span className={`badge podium-badge ${topBadge.kind}`}>{topBadge.label}</span>
                 )}
                 <span className={`tiebreaker-hint podium-tiebreaker${tiebreaker ? '' : ' is-empty'}`}>
-                  {tiebreaker || ' '}
+                  {tiebreaker || ' '}
                 </span>
               </div>
             )
@@ -275,7 +271,7 @@ export default function Leaderboard({ selectedGroup, hasLiveMatch, onShowHowItWo
                 {entry.profile?.display_name ?? 'Player'}
               </div>
               <div className="entry-stats">
-                {entry.exact_scores} exact · {Math.max(entry.correct_results - entry.exact_scores, 0)} correct
+                {entry.exact_scores} exact · {entry.correct_results} correct
                 {tiebreakerLabel && (
                   <span className="tiebreaker-hint"> · {tiebreakerLabel}</span>
                 )}
