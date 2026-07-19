@@ -319,7 +319,7 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
 
       {finalFinished === false && (
         <div className="gl-wrapped-teaser">
-          The final's soon! Your wc2026 wrapped drops after the whistle.
+          The final's soon! Your WC2026 wrapped drops after the whistle.
         </div>
       )}
 

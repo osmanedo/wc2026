@@ -110,12 +110,12 @@ export default function WrappedModal({ data, onClose }) {
           {/* Small logo accent — sits like a hat on the heading, signals
               authenticity without competing as the visual hero. */}
           <img className="wm-intro-logo" src="/fifa-world-cup-2026-logo.png" alt="World Cup 2026" />
-          <h2 className="wm-heading">your world cup 2026, wrapped</h2>
+          <h2 className="wm-heading">Your World Cup 2026, wrapped</h2>
           <Avatar url={profile?.avatar_url} name={profile?.display_name} className="wm-avatar" />
           <div className="wm-name">{profile?.display_name ?? 'player'}</div>
           {/* Signup count (1,320) includes the 235 who never picked; panel 2's
               "of {total_users}" uses the picked-users denominator for rank. */}
-          <p className="wm-copy">1,320 tippers joined. you made it to the end.</p>
+          <p className="wm-copy">1,320 tippers joined. You made it to the end!</p>
           <div className="wm-scroll-hint">scroll ↓</div>
         </section>
 
@@ -151,7 +151,7 @@ export default function WrappedModal({ data, onClose }) {
         {/* Panel 4 — Best match */}
         {showBest && (
           <section className="wm-panel">
-            <h2 className="wm-heading">your best match</h2>
+            <h2 className="wm-heading">Your best match</h2>
             <MatchStrip
               homeFlag={best_match.home_flag}
               homeName={best_match.home_team_name}
@@ -160,8 +160,8 @@ export default function WrappedModal({ data, onClose }) {
               homeVal={best_match.home_score}
               awayVal={best_match.away_score}
             />
-            <p className="wm-copy">you picked {best_match.pick_home}–{best_match.pick_away}</p>
-            <p className="wm-copy wm-copy--dim">final: {best_match.home_score}–{best_match.away_score}</p>
+            <p className="wm-copy">You picked {best_match.pick_home}–{best_match.pick_away}</p>
+            <p className="wm-copy wm-copy--dim">Final: {best_match.home_score}–{best_match.away_score}</p>
             <div className="wm-hero wm-hero--accent">{fmt(best_match.points)}</div>
             <div className="wm-hero-label">points</div>
             {bestIsExact && <div className="wm-badge wm-badge--gold">exact score</div>}
@@ -174,7 +174,7 @@ export default function WrappedModal({ data, onClose }) {
             <div className="wm-hero wm-hero--accent">{fmt(longest_streak.streak_length)}</div>
             <div className="wm-hero-label">in a row</div>
             <p className="wm-copy">
-              your best run — {longest_streak.start_match_label} to {longest_streak.end_match_label}
+              Your best run — {longest_streak.start_match_label} to {longest_streak.end_match_label}
             </p>
           </section>
         )}
@@ -183,8 +183,8 @@ export default function WrappedModal({ data, onClose }) {
         {showFinal && (
           final_pick.predicted_correctly ? (
             <section className="wm-panel wm-panel--won">
-              <h2 className="wm-heading">you called it.</h2>
-              <p className="wm-copy">{final_pick.predicted_winner_name} are your world champions.</p>
+              <h2 className="wm-heading">You called it!.</h2>
+              <p className="wm-copy">{final_pick.predicted_winner_name} are your World Champions.</p>
               <MatchStrip
                 homeFlag={final_pick.home_flag}
                 homeName={final_pick.home_team_name}
@@ -198,7 +198,7 @@ export default function WrappedModal({ data, onClose }) {
             <section className="wm-panel">
               <h2 className="wm-heading">you had {final_pick.predicted_winner_name}.</h2>
               <p className="wm-copy">
-                {actualWinnerName(final_pick)} took it. {final_pick.actual_home}–{final_pick.actual_away}.
+                {actualWinnerName(final_pick)} took it from you, ouch. {final_pick.actual_home}–{final_pick.actual_away}.
               </p>
               <MatchStrip
                 homeFlag={final_pick.home_flag}
@@ -214,8 +214,8 @@ export default function WrappedModal({ data, onClose }) {
 
         {/* Panel 7 — Goodbye */}
         <section className="wm-panel">
-          <h2 className="wm-heading">thanks for playing</h2>
-          <p className="wm-copy">wc2026 fantasy is closing after the final. the leaderboard stays live.</p>
+          <h2 className="wm-heading">Thanks for playing</h2>
+          <p className="wm-copy">WC2026 fantasy is closing 1 week after the final. The leaderboard stays live.</p>
           <p className="wm-copy wm-copy--dim">if you enjoyed it, don't forget to shout me a beer</p>
           <div className="wm-kofi"><KofiButton username="ozeduardoperez" /></div>
           <button className="wm-share-btn" onClick={handleShare} disabled={sharing}>
