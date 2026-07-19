@@ -47,9 +47,11 @@ if not live.data and not imminent.data:
     sys.exit(0)
 
 # Step 3 — load current state for all matches (used for change detection)
+# `winner` is included so we can detect the null→set transition that
+# football-data.org sometimes delivers a poll after FINISHED for shootouts.
 current_state_resp = (
     supabase.table("matches")
-    .select("id, status, home_score, away_score, home_penalties, away_penalties")
+    .select("id, status, home_score, away_score, home_penalties, away_penalties, winner")
     .execute()
 )
 current_state = {
@@ -59,6 +61,7 @@ current_state = {
         "away_score": row["away_score"],
         "home_penalties": row["home_penalties"],
         "away_penalties": row["away_penalties"],
+        "winner": row["winner"],
     }
     for row in current_state_resp.data
 }
@@ -97,6 +100,7 @@ print(f"Processed {len(results_data['matches'])} matches from football-data.org"
 # Each branch computes new values first, then writes only if they differ
 # from what's already in the DB — avoids redundant Realtime pushes
 newly_finished = []
+winner_backfilled = []  # already-FINISHED matches where winner just transitioned null→set
 writes_skipped = 0
 
 for match in results_data["matches"]:
@@ -131,19 +135,30 @@ for match in results_data["matches"]:
             home_penalties = score["penalties"]["home"]
             away_penalties = score["penalties"]["away"]
 
-        # Only write if status or score changed — catches post-match corrections
-        # from football-data.org without re-pushing unchanged rows every poll
+        # Detect winner change explicitly. football-data.org sometimes reports
+        # FINISHED with winner=null on the poll that transitions the match,
+        # then populates winner on a subsequent poll. We must (a) write the
+        # winner back to the DB when this happens, and (b) re-fire
+        # calculate_points so the advancement bonus is awarded.
+        new_winner = score["winner"]  # HOME_TEAM, AWAY_TEAM, DRAW, or null
+        winner_changed = current.get("winner") != new_winner
+
+        # Only write if something meaningful changed — catches post-match
+        # corrections from football-data.org without re-pushing unchanged
+        # rows every poll. `winner_changed` is included so a winner-only
+        # update (the shootout race case) still triggers the write.
         if (
             current.get("status") != status
             or current.get("home_score") != home_score
             or current.get("away_score") != away_score
             or current.get("home_penalties") != home_penalties
             or current.get("away_penalties") != away_penalties
+            or winner_changed
         ):
             supabase.table("matches").update({
                 "home_score": home_score,
                 "away_score": away_score,
-                "winner": score["winner"],  # HOME_TEAM, AWAY_TEAM, or DRAW
+                "winner": new_winner,
                 "status": status,
                 "home_penalties": home_penalties,
                 "away_penalties": away_penalties,
@@ -151,10 +166,17 @@ for match in results_data["matches"]:
         else:
             writes_skipped += 1
 
-        # Only run points calculation for matches that just transitioned to FINISHED
+        # Run points calculation when:
+        #   1. Match just transitioned to FINISHED (first time we've seen it), OR
+        #   2. Match was already FINISHED but winner just changed (shootout race)
+        # calculate_points is idempotent — it loops all picks for the match
+        # and overwrites points_earned — so re-running is safe.
         if match_id not in already_finished_ids:
             supabase.rpc("calculate_points", {"match_id_input": match_id}).execute()
             newly_finished.append(match_id)
+        elif winner_changed:
+            supabase.rpc("calculate_points", {"match_id_input": match_id}).execute()
+            winner_backfilled.append(match_id)
 
     elif status in ("IN_PLAY", "PAUSED", "EXTRA_TIME"):
         # score.fullTime is the current cumulative live score (including any ET goals as they happen)
@@ -195,6 +217,9 @@ for match in results_data["matches"]:
 
 if writes_skipped:
     print(f"Skipped {writes_skipped} no-op write(s)")
+
+if winner_backfilled:
+    print(f"Winner backfilled for {len(winner_backfilled)} already-FINISHED match(es): {winner_backfilled}")
 
 # Step 6 — generate post-match summaries.
 # Fire for every FINISHED match that doesn't yet have a post_match_summary in
