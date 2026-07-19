@@ -1,0 +1,310 @@
+/* WC2026 Wrapped — full-screen, dark, scroll-snap story modal. Its own
+   immersive world (the app is light-themed); reuses app fonts + accent
+   colours. Copy tone: lowercase, dry, no emoji. */
+
+.wm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(82, 183, 136, 0.16), transparent 45%),
+    linear-gradient(180deg, #0a1410 0%, #05201a 55%, #071a14 100%);
+  color: #f4f7f5;
+  font-family: 'DM Sans', sans-serif;
+  animation: wm-fade 0.25s ease-out;
+}
+
+@keyframes wm-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* Close button lives on the overlay, outside the scroll container, so it
+   stays fixed top-right across every panel. */
+.wm-close {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 2100;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.10);
+  color: #f4f7f5;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
+}
+
+.wm-close:hover { background: rgba(255, 255, 255, 0.2); }
+
+.wm-scroll {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Each panel fills the viewport and snaps into place. */
+.wm-panel {
+  height: 100dvh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 72px 28px;
+  gap: 18px;
+}
+
+.wm-heading {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  max-width: 340px;
+}
+
+.wm-copy {
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgba(244, 247, 245, 0.85);
+  max-width: 320px;
+}
+
+.wm-copy--dim { color: rgba(244, 247, 245, 0.55); }
+
+/* Panel 1 logo — header ornament above the heading, small enough to stay an
+   accent (the heading remains the hero). */
+.wm-intro-logo {
+  width: 96px;
+  height: auto;
+  margin-bottom: 4px;
+}
+
+/* Avatar (panel 1) */
+.wm-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(82, 183, 136, 0.5);
+}
+
+.wm-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(82, 183, 136, 0.18);
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 34px;
+  color: var(--green-accent, #52b788);
+}
+
+.wm-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.3px;
+}
+
+.wm-scroll-hint {
+  position: absolute;
+  bottom: 32px;
+  font-size: 13px;
+  color: rgba(244, 247, 245, 0.45);
+  animation: wm-bob 1.8s ease-in-out infinite;
+}
+
+@keyframes wm-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+/* Hero stat (rank / points / streak). Font-size is capped so the widest
+   expected rank ("#1085", 5 chars) fits inside the panel with side margins;
+   a single fixed cap keeps it consistent for #1 through #1085. */
+.wm-hero {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(64px, 17vw, 96px);
+  line-height: 0.95;
+  letter-spacing: -3px;
+  color: #ffffff;
+  max-width: 100%;
+  padding: 0 8px;
+}
+
+.wm-hero--accent { color: var(--green-accent, #52b788); }
+
+.wm-hero-sub {
+  font-size: 18px;
+  color: rgba(244, 247, 245, 0.55);
+}
+
+.wm-hero-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: rgba(244, 247, 245, 0.6);
+}
+
+/* Percentile / exact-score badge */
+.wm-badge {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+
+.wm-badge--gold   { color: #f59e0b; background: rgba(245, 158, 11, 0.14); }
+.wm-badge--silver { color: #cbd5e1; background: rgba(148, 163, 184, 0.16); }
+.wm-badge--subtle { color: rgba(244, 247, 245, 0.7); background: rgba(255, 255, 255, 0.07); }
+
+/* Stat row (panel 3) */
+.wm-statrow {
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.wm-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 84px;
+}
+
+.wm-stat-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 32px;
+  color: #ffffff;
+}
+
+.wm-stat-label {
+  font-size: 12px;
+  color: rgba(244, 247, 245, 0.55);
+}
+
+/* Match strip (panels 4 & 6) */
+.wm-match {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px 0;
+}
+
+.wm-match-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 96px;
+}
+
+.wm-flag {
+  width: 52px;
+  height: 39px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.wm-match-team {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: rgba(244, 247, 245, 0.9);
+}
+
+.wm-match-score {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 40px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wm-match-dash { color: rgba(244, 247, 245, 0.4); }
+
+/* Won-final celebratory treatment */
+.wm-panel--won {
+  background: radial-gradient(circle at 50% 40%, rgba(245, 158, 11, 0.16), transparent 55%);
+}
+
+.wm-panel--won .wm-heading { color: #f59e0b; }
+
+.wm-panel--won .wm-match-score {
+  text-shadow: 0 0 24px rgba(245, 158, 11, 0.5);
+}
+
+/* Panel 7 actions */
+.wm-kofi { margin: 6px 0; }
+
+/* Ko-fi trigger sits on the dark modal, but KofiButton ships light-theme
+   styling (invisible text here). Scope a dark treatment to the modal only —
+   KofiButton.jsx stays untouched so the leaderboard keeps its light button.
+   Secondary CTA: outlined, quieter than the solid "share your wrapped". */
+.wm-overlay .kofi-btn {
+  background: transparent;
+  color: rgba(244, 247, 245, 0.85);
+  border: 1px solid rgba(244, 247, 245, 0.3);
+}
+
+.wm-overlay .kofi-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(244, 247, 245, 0.55);
+  box-shadow: none;
+}
+
+.wm-share-btn {
+  margin-top: 8px;
+  background: var(--green-accent, #52b788);
+  color: #052018;
+  border: none;
+  border-radius: 999px;
+  padding: 15px 34px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+  transition: transform 0.12s, opacity 0.15s;
+}
+
+.wm-share-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.wm-share-btn:disabled { opacity: 0.6; cursor: default; }
+
+.wm-share-error {
+  font-size: 13px;
+  color: #fca5a5;
+  margin-top: 4px;
+}
+
+/* Off-screen capture target — never visible, never interactive. */
+.wm-sharecard-holder {
+  position: fixed;
+  left: -9999px;
+  top: 0;
+  pointer-events: none;
+  opacity: 1;
+}
+
+@media (min-width: 600px) {
+  .wm-heading { font-size: 34px; max-width: 460px; }
+  .wm-copy { font-size: 18px; max-width: 420px; }
+}

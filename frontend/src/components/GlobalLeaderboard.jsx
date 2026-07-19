@@ -4,12 +4,18 @@ import './Leaderboard.css'
 import './GlobalLeaderboard.css'
 import KofiButton from './KofiButton'
 import LeaderboardFixNotice from './LeaderboardFixNotice'
+import WrappedModal from './WrappedModal'
 
 const TOP_N = 10
 const NEIGHBORS = 3
 const PAGE_SIZE = 50
 const POLL_INTERVAL_MS = 30_000
 const SKELETON_ROWS = 8
+
+// The tournament final. The Wrapped experience unlocks only once this match
+// is FINISHED; before that the pre-final teaser shows instead.
+const FINAL_MATCH_ID = 537390
+const WRAPPED_SEEN_KEY = 'wc2026_wrapped_seen'
 
 function LeaderRow({ entry, rank, isCurrentUser }) {
   return (
@@ -71,6 +77,11 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
   // Social proof
   const [userCount, setUserCount] = useState(null)
 
+  // Wrapped experience
+  const [finalFinished, setFinalFinished] = useState(null) // null = unknown yet
+  const [wrappedData, setWrappedData] = useState(null)
+  const [wrappedOpen, setWrappedOpen] = useState(false)
+
   useEffect(() => {
     let cancelled = false
     supabase.rpc('get_user_count').then(({ data, error: countError }) => {
@@ -78,6 +89,44 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
       setUserCount(typeof data === 'number' ? data : Number(data))
     })
     return () => { cancelled = true }
+  }, [])
+
+  // Is the final over yet? Drives the teaser banner vs. the Wrapped unlock.
+  useEffect(() => {
+    let cancelled = false
+    supabase
+      .from('matches')
+      .select('status')
+      .eq('id', FINAL_MATCH_ID)
+      .single()
+      .then(({ data, error: matchError }) => {
+        if (cancelled || matchError) return
+        setFinalFinished(data?.status === 'FINISHED')
+      })
+    return () => { cancelled = true }
+  }, [])
+
+  // Once the final is finished and a user is signed in, pull their wrapped
+  // stats one time. Zero-pick users get nothing (no button, no auto-fire).
+  // First-time viewers auto-fire the modal; localStorage is only stamped on
+  // close so a mid-scroll reload doesn't rob them of the experience.
+  useEffect(() => {
+    if (finalFinished !== true || !user?.id) return
+    let cancelled = false
+    supabase.rpc('get_user_wrapped_stats', { user_uuid: user.id }).then(({ data, error: rpcError }) => {
+      if (cancelled || rpcError || !data) return
+      if ((data.stats?.total_points ?? 0) === 0) return // zero-pick user
+      setWrappedData(data)
+      if (localStorage.getItem(WRAPPED_SEEN_KEY) !== 'true') {
+        setWrappedOpen(true)
+      }
+    })
+    return () => { cancelled = true }
+  }, [finalFinished, user?.id])
+
+  const closeWrapped = useCallback(() => {
+    localStorage.setItem(WRAPPED_SEEN_KEY, 'true')
+    setWrappedOpen(false)
   }, [])
 
   const socialProof = userCount != null && userCount >= 10 ? (
@@ -256,6 +305,10 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
     </>
   )
 
+  // Wrapped teaser (pre-final) and unlock (post-final). Banner is not
+  // dismissible and disappears the moment the final is FINISHED.
+  const canShowWrappedButton = finalFinished === true && !!wrappedData
+
   return (
     <div className="leaderboard">
       <LeaderboardFixNotice />
@@ -263,8 +316,25 @@ export default function GlobalLeaderboard({ hasLiveMatch, onShowHowItWorks, user
         <h2 className="leaderboard-title">Leaderboard</h2>
         <KofiButton username="ozeduardoperez" />
       </div>
+
+      {finalFinished === false && (
+        <div className="gl-wrapped-teaser">
+          The final's soon! Your wc2026 wrapped drops after the whistle.
+        </div>
+      )}
+
+      {canShowWrappedButton && (
+        <button type="button" className="gl-wrapped-btn" onClick={() => setWrappedOpen(true)}>
+          view my wrapped
+        </button>
+      )}
+
       {socialProof}
       {mode === 'neighborhood' ? renderNeighborhood() : renderFull()}
+
+      {wrappedOpen && wrappedData && (
+        <WrappedModal data={wrappedData} onClose={closeWrapped} />
+      )}
     </div>
   )
 }

@@ -182,3 +182,40 @@
   justify-content: space-between;
   margin-bottom: 0;
 }
+
+/* Wrapped pre-final teaser — understated, not dismissible. */
+.gl-wrapped-teaser {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--green-light);
+  text-align: center;
+  background: rgba(82, 183, 136, 0.10);
+  border: 1px solid rgba(82, 183, 136, 0.22);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin: 12px 0 4px;
+}
+
+/* Wrapped post-final unlock button — prominent, near the header. */
+.gl-wrapped-btn {
+  display: block;
+  width: 100%;
+  margin: 14px 0 4px;
+  padding: 13px 16px;
+  background: var(--green);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s, background 0.15s;
+}
+
+.gl-wrapped-btn:hover {
+  background: var(--green-light);
+  transform: translateY(-1px);
+}

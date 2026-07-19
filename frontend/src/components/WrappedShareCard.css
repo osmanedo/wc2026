@@ -1,0 +1,149 @@
+/* Off-screen capture card. Rendered at an exact 1080×1920 so html-to-image
+   produces a crisp, consistent Instagram-story PNG regardless of viewport.
+   Dark, self-contained visual language matching the Wrapped modal. */
+
+.wsc {
+  width: 1080px;
+  height: 1920px;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(82, 183, 136, 0.22), transparent 55%),
+    linear-gradient(180deg, #0a1410 0%, #05201a 60%, #071a14 100%);
+  color: #f4f7f5;
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 110px 90px 130px;
+  overflow: hidden;
+}
+
+/* Identity header — poster-style logo with the wordmark beneath it. */
+.wsc-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.wsc-logo {
+  width: 240px;
+  height: auto;
+}
+
+.wsc-wordmark {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  letter-spacing: 1px;
+  color: var(--green-accent, #52b788);
+}
+
+.wsc-user {
+  margin-top: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.wsc-avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid rgba(82, 183, 136, 0.55);
+}
+
+.wsc-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(82, 183, 136, 0.18);
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 76px;
+  color: var(--green-accent, #52b788);
+}
+
+.wsc-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 58px;
+  letter-spacing: -0.5px;
+}
+
+.wsc-rank-block {
+  margin-top: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Capped so "#1085" (widest expected) stays inside the 900px content width
+   with clear margins, rather than sizing to fill and overflowing. */
+.wsc-rank {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 200px;
+  line-height: 0.9;
+  letter-spacing: -4px;
+  color: #ffffff;
+}
+
+.wsc-rank-sub {
+  font-size: 48px;
+  color: rgba(244, 247, 245, 0.55);
+}
+
+.wsc-badge {
+  margin-top: 34px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 34px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 16px 40px;
+  border-radius: 999px;
+}
+
+.wsc-badge--gold   { color: #f59e0b; background: rgba(245, 158, 11, 0.14); }
+.wsc-badge--silver { color: #cbd5e1; background: rgba(148, 163, 184, 0.16); }
+.wsc-badge--subtle { color: rgba(244, 247, 245, 0.7); background: rgba(255, 255, 255, 0.07); }
+
+.wsc-stats {
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  gap: 70px;
+  width: 100%;
+}
+
+.wsc-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.wsc-stat-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 92px;
+  color: var(--green-accent, #52b788);
+  line-height: 1;
+}
+
+.wsc-stat-label {
+  font-size: 32px;
+  color: rgba(244, 247, 245, 0.55);
+}
+
+.wsc-final {
+  margin-top: 80px;
+  font-size: 40px;
+  line-height: 1.4;
+  color: rgba(244, 247, 245, 0.9);
+  max-width: 760px;
+}
